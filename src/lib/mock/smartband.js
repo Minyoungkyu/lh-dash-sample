@@ -38,6 +38,47 @@ export const WORKERS = [
   { id: 'W-1053', name: '조준서', company: '미래ENG', team: '철근팀', online: true, spo2: 94, skinTemp: 36.9, locReg: true, zone: '마곡 SH', lastSeen: '1분 전', status: 'caution' },
   { id: 'W-1054', name: '배승우', company: '미래ENG', team: '전기팀', online: true, spo2: 98, skinTemp: 33.7, locReg: true, zone: '부천광희 재건축', lastSeen: '방금', status: 'normal' },
   { id: 'W-1055', name: '남지호', company: '미래ENG', team: '보통인부', online: true, spo2: 95, skinTemp: 36.3, locReg: false, zone: '이수페타시스 5공장', lastSeen: '방금', status: 'caution' },
+
+  // ── 브라운스톤 양양 (추가) ──
+  { id: 'W-1056', name: '서준영', company: '대한건설', team: '골조팀', online: true, spo2: 98, skinTemp: 34.3, locReg: true, zone: '브라운스톤 양양', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1057', name: '김도현', company: '대한건설', team: '철근팀', online: true, spo2: 97, skinTemp: 34.6, locReg: true, zone: '브라운스톤 양양', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1058', name: '이준호', company: '동서건설', team: '형틀목공', online: true, spo2: 99, skinTemp: 33.8, locReg: true, zone: '브라운스톤 양양', lastSeen: '1분 전', status: 'normal' },
+  { id: 'W-1059', name: '박서진', company: '대한건설', team: '설비팀', online: true, spo2: 96, skinTemp: 35.1, locReg: true, zone: '브라운스톤 양양', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1060', name: '정우진', company: '미래ENG', team: '보통인부', online: true, spo2: 94, skinTemp: 36.9, locReg: true, zone: '브라운스톤 양양', lastSeen: '방금', status: 'caution' },
+  { id: 'W-1061', name: '최민수', company: '대한건설', team: '전기팀', online: true, spo2: 98, skinTemp: 34.0, locReg: true, zone: '브라운스톤 양양', lastSeen: '방금', status: 'normal' },
+
+  // ── 마곡 SH (추가) ──
+  { id: 'W-1062', name: '강준호', company: '대한건설', team: '골조팀', online: true, spo2: 97, skinTemp: 34.7, locReg: true, zone: '마곡 SH', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1063', name: '윤성민', company: '미래ENG', team: '철근팀', online: true, spo2: 95, skinTemp: 36.2, locReg: true, zone: '마곡 SH', lastSeen: '1분 전', status: 'caution' },
+  { id: 'W-1064', name: '임재현', company: '한울설비', team: '설비팀', online: true, spo2: 98, skinTemp: 34.4, locReg: true, zone: '마곡 SH', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1065', name: '한동욱', company: '대한건설', team: '보통인부', online: true, spo2: 93, skinTemp: 37.0, locReg: true, zone: '마곡 SH', lastSeen: '방금', status: 'caution' },
+  { id: 'W-1066', name: '오지훈', company: '성진ENG', team: '전기팀', online: true, spo2: 99, skinTemp: 33.6, locReg: true, zone: '마곡 SH', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1067', name: '신경민', company: '대한건설', team: '형틀목공', online: false, spo2: null, skinTemp: null, locReg: false, zone: '-', lastSeen: '8분 전', status: 'offline' },
+
+  // ── 부천광희 재건축 (추가) ──
+  { id: 'W-1068', name: '조현우', company: '미래ENG', team: '골조팀', online: true, spo2: 98, skinTemp: 34.2, locReg: true, zone: '부천광희 재건축', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1069', name: '배준서', company: '대한건설', team: '철근팀', online: true, spo2: 90, skinTemp: 37.4, locReg: true, zone: '부천광희 재건축', lastSeen: '방금', status: 'danger' },
+  { id: 'W-1070', name: '남건우', company: '동서건설', team: '설비팀', online: true, spo2: 97, skinTemp: 34.9, locReg: true, zone: '부천광희 재건축', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1071', name: '유지호', company: '미래ENG', team: '보통인부', online: true, spo2: 95, skinTemp: 36.4, locReg: true, zone: '부천광희 재건축', lastSeen: '1분 전', status: 'caution' },
+  { id: 'W-1072', name: '곽태양', company: '대한건설', team: '전기팀', online: false, spo2: null, skinTemp: null, locReg: false, zone: '-', lastSeen: '15분 전', status: 'offline' },
+  { id: 'W-1073', name: '문성호', company: '대한건설', team: '도장팀', online: true, spo2: 98, skinTemp: 34.1, locReg: true, zone: '부천광희 재건축', lastSeen: '방금', status: 'normal' },
+
+  // ── 이수페타시스 5공장 (추가) ──
+  { id: 'W-1074', name: '노준영', company: '한울설비', team: '설비팀', online: true, spo2: 97, skinTemp: 34.5, locReg: true, zone: '이수페타시스 5공장', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1075', name: '하민재', company: '성진ENG', team: '철근팀', online: true, spo2: 96, skinTemp: 35.2, locReg: true, zone: '이수페타시스 5공장', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1076', name: '구본길', company: '대한건설', team: '골조팀', online: true, spo2: 99, skinTemp: 33.7, locReg: true, zone: '이수페타시스 5공장', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1077', name: '진서우', company: '미래ENG', team: '보통인부', online: true, spo2: 94, skinTemp: 36.8, locReg: true, zone: '이수페타시스 5공장', lastSeen: '1분 전', status: 'caution' },
+  { id: 'W-1078', name: '표승현', company: '대한건설', team: '전기팀', online: true, spo2: 98, skinTemp: 34.3, locReg: true, zone: '이수페타시스 5공장', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1079', name: '반지민', company: '동서건설', team: '형틀목공', online: true, spo2: 97, skinTemp: 34.8, locReg: true, zone: '이수페타시스 5공장', lastSeen: '방금', status: 'normal' },
+
+  // ── 브라운스톤 월곡센트럴 (추가) ──
+  { id: 'W-1080', name: '선우진', company: '대한건설', team: '골조팀', online: true, spo2: 98, skinTemp: 34.0, locReg: true, zone: '브라운스톤 월곡센트럴', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1081', name: '방현수', company: '미래ENG', team: '철근팀', online: true, spo2: 97, skinTemp: 34.6, locReg: true, zone: '브라운스톤 월곡센트럴', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1082', name: '채동훈', company: '한울설비', team: '설비팀', online: true, spo2: 95, skinTemp: 36.1, locReg: true, zone: '브라운스톤 월곡센트럴', lastSeen: '1분 전', status: 'caution' },
+  { id: 'W-1083', name: '위성찬', company: '대한건설', team: '보통인부', online: true, spo2: 93, skinTemp: 37.1, locReg: true, zone: '브라운스톤 월곡센트럴', lastSeen: '방금', status: 'caution' },
+  { id: 'W-1084', name: '도경석', company: '성진ENG', team: '전기팀', online: true, spo2: 99, skinTemp: 33.9, locReg: true, zone: '브라운스톤 월곡센트럴', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1085', name: '명재원', company: '대한건설', team: '형틀목공', online: true, spo2: 96, skinTemp: 35.0, locReg: true, zone: '브라운스톤 월곡센트럴', lastSeen: '방금', status: 'normal' },
+  { id: 'W-1086', name: '국지완', company: '동서건설', team: '방수팀', online: false, spo2: null, skinTemp: null, locReg: false, zone: '-', lastSeen: '22분 전', status: 'offline' },
 ];
 
 // SOS 팝업 시연용 대상

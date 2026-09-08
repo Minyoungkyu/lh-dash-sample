@@ -1,5 +1,5 @@
 import { Layers, Grid2x2 } from 'lucide-react';
-import { ZONES, ZONE_STATUS } from '@/lib/mock/zones';
+import { ZONES } from '@/lib/mock/zones';
 import { useUIStore } from '@/stores/useUIStore';
 
 /**
@@ -29,7 +29,7 @@ export default function ZoneSwitcher() {
         전체
       </button>
       {ZONES.map((z) => {
-        const color = ZONE_STATUS[z.status]?.color ?? '#38bdf8';
+        const color = z.color ?? '#38bdf8';
         const on = activeZone === z.id;
         return (
           <button

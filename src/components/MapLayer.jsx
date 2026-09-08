@@ -3,7 +3,7 @@ import maplibregl from 'maplibre-gl';
 import { SITE, TILE } from '@/lib/mock/site';
 import { CCTV_LIST } from '@/lib/mock/cctv';
 import { EQUIP_LIST } from '@/lib/mock/equipment';
-import { ZONES, ZONE_STATUS, SITE_BOUNDS } from '@/lib/mock/zones';
+import { ZONES, SITE_BOUNDS } from '@/lib/mock/zones';
 import { cctvEl, equipEl, zoneLabelEl } from '@/components/map/pinIcons';
 import { useUIStore } from '@/stores/useUIStore';
 
@@ -26,7 +26,7 @@ function zoneGeoJSON(activeZone) {
   return {
     type: 'FeatureCollection',
     features: ZONES.map((z) => {
-      const color = ZONE_STATUS[z.status]?.color ?? '#38bdf8';
+      const color = z.color ?? '#38bdf8';
       const active = activeZone === z.id;
       const dim = activeZone && !active;
       const ring = z.polygon.map(([lat, lng]) => [lng, lat]);
@@ -106,7 +106,7 @@ export default function MapLayer() {
       map.on('mouseleave', 'zone-fill', () => (map.getCanvas().style.cursor = ''));
 
       ZONES.forEach((z) => {
-        const color = ZONE_STATUS[z.status]?.color ?? '#38bdf8';
+        const color = z.color ?? '#38bdf8';
         const el = zoneLabelEl(z, color);
         el.onclick = () => useUIStore.getState().setActiveZone(z.id); // 항상 해당 공구로 확대(토글 X)
         // 라벨을 폴리곤 상단(위쪽) 위에 띄워 핀들과 겹치지 않게 (anchor:bottom + 위로 오프셋)

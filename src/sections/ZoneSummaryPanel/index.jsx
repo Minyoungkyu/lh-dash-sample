@@ -1,5 +1,5 @@
 import { LayoutGrid, Users, Wrench, Video, User, Phone, CalendarClock, MapPin } from 'lucide-react';
-import { ZONES, ZONE_STATUS } from '@/lib/mock/zones';
+import { ZONES } from '@/lib/mock/zones';
 import { WORKERS } from '@/lib/mock/smartband';
 import { EQUIP_LIST } from '@/lib/mock/equipment';
 import { CCTV_LIST } from '@/lib/mock/cctv';
@@ -32,33 +32,27 @@ function Metric({ icon: Icon, value, label, color }) {
 }
 
 function ZoneCard({ zone, active, onClick }) {
-  const st = ZONE_STATUS[zone.status] ?? ZONE_STATUS.normal;
+  const color = zone.color ?? '#38bdf8';
   return (
     <button
       onClick={onClick}
       className="flex flex-col text-left transition-all"
       style={{
         gap: 12, padding: 18, borderRadius: 14,
-        background: active ? `${st.color}1a` : 'rgba(0,0,0,0.32)',
-        border: `1px solid ${active ? st.color : st.color + '44'}`,
-        borderLeft: `5px solid ${st.color}`, cursor: 'pointer',
+        background: active ? `${color}1a` : 'rgba(0,0,0,0.32)',
+        border: `1px solid ${active ? color : color + '44'}`,
+        borderLeft: `5px solid ${color}`, cursor: 'pointer',
       }}
     >
       <div className="flex items-center" style={{ gap: 10 }}>
         <span className="font-black text-white" style={{ fontSize: 22 }}>{zone.name}</span>
         <span className="text-slate-400 font-bold" style={{ fontSize: 14 }}>{zone.phase}</span>
-        <span
-          className={`ml-auto font-black ${zone.status === 'danger' ? 'live-blink' : ''}`}
-          style={{ fontSize: 13, color: st.color, background: `${st.color}22`, border: `1.5px solid ${st.color}`, padding: '4px 12px', borderRadius: 999 }}
-        >
-          {st.label}
-        </span>
       </div>
       <div className="flex items-center" style={{ gap: 10 }}>
         <div style={{ flex: 1, height: 9, borderRadius: 6, background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
-          <div style={{ width: `${zone.progress}%`, height: '100%', background: `linear-gradient(90deg, ${st.color}aa, ${st.color})` }} />
+          <div style={{ width: `${zone.progress}%`, height: '100%', background: `linear-gradient(90deg, ${color}aa, ${color})` }} />
         </div>
-        <span className="font-black" style={{ fontSize: 15, color: st.color, width: 42, textAlign: 'right' }}>{zone.progress}%</span>
+        <span className="font-black" style={{ fontSize: 15, color, width: 42, textAlign: 'right' }}>{zone.progress}%</span>
       </div>
       <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         <Field icon={User} label="담당자" value={zone.manager} />

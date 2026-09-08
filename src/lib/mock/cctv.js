@@ -22,6 +22,32 @@ export const CCTV_LIST = [
   // 브라운스톤 월곡센트럴 (불로)
   { id: 'CAM-11', name: '가설 게이트', type: 'fixed', status: 'online', hasSpeaker: true, lat: 37.6428, lng: 126.6238, zone: '브라운스톤 월곡센트럴' },
   { id: 'CAM-12', name: '경계 펜스 남측', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.6412, lng: 126.6262, zone: '브라운스톤 월곡센트럴' },
+
+  // ── 추가 ── 브라운스톤 양양
+  { id: 'CAM-13', name: '지하주차장 램프', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.6028, lng: 126.6516, zone: '브라운스톤 양양' },
+  { id: 'CAM-14', name: '2블록 골조', type: 'rotating', status: 'online', hasSpeaker: true, lat: 37.6060, lng: 126.6540, zone: '브라운스톤 양양' },
+  { id: 'CAM-15', name: '자재 창고', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.6020, lng: 126.6555, zone: '브라운스톤 양양' },
+  { id: 'CAM-16', name: '후문 통로', type: 'fixed', status: 'offline', hasSpeaker: false, lat: 37.6065, lng: 126.6522, zone: '브라운스톤 양양' },
+  // 추가 ── 마곡 SH
+  { id: 'CAM-17', name: '진입로 차단기', type: 'rotating', status: 'online', hasSpeaker: true, lat: 37.5738, lng: 126.6240, zone: '마곡 SH' },
+  { id: 'CAM-18', name: '흙막이 서측', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.5705, lng: 126.6250, zone: '마곡 SH' },
+  { id: 'CAM-19', name: '현장 사무동 앞', type: 'rotating', status: 'online', hasSpeaker: true, lat: 37.5735, lng: 126.6278, zone: '마곡 SH' },
+  { id: 'CAM-20', name: '토사 반출구', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.5700, lng: 126.6270, zone: '마곡 SH' },
+  // 추가 ── 부천광희 재건축
+  { id: 'CAM-21', name: '1블록 굴착부', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.6195, lng: 126.6905, zone: '부천광희 재건축' },
+  { id: 'CAM-22', name: '크레인 상부', type: 'rotating', status: 'online', hasSpeaker: true, lat: 37.6178, lng: 126.6885, zone: '부천광희 재건축' },
+  { id: 'CAM-23', name: '지하 3층', type: 'fixed', status: 'offline', hasSpeaker: true, lat: 37.6185, lng: 126.6920, zone: '부천광희 재건축' },
+  { id: 'CAM-24', name: '자재 하역장', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.6170, lng: 126.6908, zone: '부천광희 재건축' },
+  // 추가 ── 이수페타시스 5공장
+  { id: 'CAM-25', name: '타설 구역', type: 'fixed', status: 'online', hasSpeaker: true, lat: 37.5862, lng: 126.7148, zone: '이수페타시스 5공장' },
+  { id: 'CAM-26', name: '3층 골조', type: 'rotating', status: 'online', hasSpeaker: false, lat: 37.5848, lng: 126.7130, zone: '이수페타시스 5공장' },
+  { id: 'CAM-27', name: '정문 게이트', type: 'rotating', status: 'online', hasSpeaker: true, lat: 37.5868, lng: 126.7160, zone: '이수페타시스 5공장' },
+  { id: 'CAM-28', name: '자재 야적장', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.5840, lng: 126.7140, zone: '이수페타시스 5공장' },
+  // 추가 ── 브라운스톤 월곡센트럴
+  { id: 'CAM-29', name: '부지 남측', type: 'rotating', status: 'online', hasSpeaker: true, lat: 37.6405, lng: 126.6245, zone: '브라운스톤 월곡센트럴' },
+  { id: 'CAM-30', name: '가설사무소', type: 'fixed', status: 'online', hasSpeaker: false, lat: 37.6435, lng: 126.6255, zone: '브라운스톤 월곡센트럴' },
+  { id: 'CAM-31', name: '진입 게이트', type: 'fixed', status: 'online', hasSpeaker: true, lat: 37.6438, lng: 126.6268, zone: '브라운스톤 월곡센트럴' },
+  { id: 'CAM-32', name: '경계 동측', type: 'fixed', status: 'offline', hasSpeaker: false, lat: 37.6408, lng: 126.6272, zone: '브라운스톤 월곡센트럴' },
 ];
 
 export const CCTV_TYPE_LABEL = {

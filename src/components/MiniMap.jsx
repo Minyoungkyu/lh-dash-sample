@@ -3,7 +3,6 @@ import maplibregl from 'maplibre-gl';
 import { TILE } from '@/lib/mock/site';
 import { CCTV_LIST } from '@/lib/mock/cctv';
 import { EQUIP_LIST } from '@/lib/mock/equipment';
-import { ZONE_STATUS } from '@/lib/mock/zones';
 import { cctvEl, equipEl } from '@/components/map/pinIcons';
 import { useUIStore } from '@/stores/useUIStore';
 
@@ -38,7 +37,7 @@ export default function MiniMap({ zone }) {
     });
     mapRef.current = map;
 
-    const color = ZONE_STATUS[zone.status]?.color ?? '#38bdf8';
+    const color = zone.color ?? '#38bdf8';
     map.on('load', () => {
       // 이 공구 경계
       const ring = zone.polygon.map(([lat, lng]) => [lng, lat]);
@@ -88,15 +87,14 @@ export default function MiniMap({ zone }) {
     return () => { map.remove(); mapRef.current = null; };
   }, [zone]);
 
-  const st = ZONE_STATUS[zone.status] ?? ZONE_STATUS.normal;
+  const zoneColor = zone.color ?? '#38bdf8';
   return (
-    <div className="relative h-full w-full overflow-hidden" style={{ borderRadius: 14, border: `1px solid ${st.color}66` }}>
+    <div className="relative h-full w-full overflow-hidden" style={{ borderRadius: 14, border: `1px solid ${zoneColor}66` }}>
       <div ref={containerRef} style={{ position: 'absolute', inset: 0 }} />
       {/* 칸 헤더 */}
       <div className="absolute flex items-center panel" style={{ top: 12, left: 12, gap: 10, padding: '8px 14px', borderRadius: 10, zIndex: 5 }}>
-        <span className="font-black text-white" style={{ fontSize: 18 }}>{zone.name}</span>
+        <span className="font-black" style={{ fontSize: 18, color: zoneColor }}>{zone.name}</span>
         <span className="text-slate-400 font-bold" style={{ fontSize: 13 }}>{zone.phase}</span>
-        <span className="font-black" style={{ fontSize: 12, color: st.color, background: `${st.color}22`, border: `1px solid ${st.color}`, padding: '2px 9px', borderRadius: 999 }}>{st.label}</span>
       </div>
     </div>
   );
