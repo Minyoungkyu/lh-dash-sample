@@ -77,7 +77,7 @@ export default function Header() {
         </div>
         <div className="flex flex-col">
           <span className="font-black text-white" style={{ fontSize: 30, letterSpacing: '0.01em' }}>
-            이수건설 통합관제 대시보드
+            LH 남사동탄 통합관제 대시보드
           </span>
           <span className="text-cyan-300 font-bold" style={{ fontSize: 17 }}>
             {SITE.name} <span className="text-slate-500">· {SITE.code}</span>
