@@ -59,7 +59,7 @@ export default function MiniMap({ zone }) {
           map.flyTo({ center: [cam.lng, cam.lat], zoom: 17.5, duration: 800 });
           useUIStore.getState().openCellPopup(zone.id, 'cctv', cam);
         };
-        new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([cam.lng, cam.lat]).addTo(map);
+        new maplibregl.Marker({ element: el, anchor: 'center', offset: [0, 6] }).setLngLat([cam.lng, cam.lat]).addTo(map);
       });
       EQUIP_LIST.filter((e) => e.zone === zone.id).forEach((eq) => {
         const el = equipEl(eq);
@@ -69,7 +69,7 @@ export default function MiniMap({ zone }) {
           map.flyTo({ center: [eq.lng, eq.lat], zoom: 17.5, duration: 800 });
           useUIStore.getState().openCellPopup(zone.id, 'equip', eq);
         };
-        new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([eq.lng, eq.lat]).addTo(map);
+        new maplibregl.Marker({ element: el, anchor: 'center', offset: [0, 6] }).setLngLat([eq.lng, eq.lat]).addTo(map);
       });
     });
 

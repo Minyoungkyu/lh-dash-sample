@@ -1,17 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
-import { BarChart3, Wrench, Video, Volume2, VolumeX } from 'lucide-react';
+import { useMemo } from 'react';
+import { BarChart3, Wrench, Video, Volume2, VolumeX, Maximize2 } from 'lucide-react';
 import { ZONES } from '@/lib/mock/zones';
 import { EQUIP_LIST, EQUIP_STATUS, EQUIP_KIND_LABEL } from '@/lib/mock/equipment';
 import { CCTV_LIST, CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
 import { useUIStore } from '@/stores/useUIStore';
 
 /**
- * HudSummaryTable — 공정 진행 / 중장비 / CCTV 요약을 표 형태로 자동 로테이션(4초).
- * 좌측 패널 상단부. (근로자 생체는 우측 '스마트밴드 현황'과 중복되어 제외)
+ * HudSummaryTable — 공정 진행 / 중장비 / CCTV 요약표. 탭 버튼으로 수동 전환.
+ * 좌측 패널 상단부. 확장(⤢) 버튼으로 좌측 드로어에 대형 뷰 오픈.
  * 중장비/CCTV 는 공구 선택 시 필터, 공정 진행은 전 공구 개요 + 선택 공구 강조.
  */
-const ROTATE_MS = 4000;
-
 const CATS = [
   { key: 'progress', label: '공정 진행', icon: BarChart3, color: '#a78bfa' },
   { key: 'equip', label: '중장비', icon: Wrench, color: '#f59e0b' },
@@ -35,52 +33,67 @@ function Dot({ color, glow }) {
 
 export default function HudSummaryTable() {
   const activeZone = useUIStore((s) => s.activeZone);
-  const [idx, setIdx] = useState(0);
-
-  useEffect(() => { setIdx(0); }, [activeZone]);
-  useEffect(() => {
-    const id = setInterval(() => setIdx((i) => (i + 1) % CATS.length), ROTATE_MS);
-    return () => clearInterval(id);
-  }, []);
+  const summaryCat = useUIStore((s) => s.summaryCat);
+  const setSummaryCat = useUIStore((s) => s.setSummaryCat);
+  const toggleLeftDock = useUIStore((s) => s.toggleLeftDock);
 
   const inZone = (x) => (activeZone ? x.zone === activeZone : true);
   const equip = useMemo(() => EQUIP_LIST.filter(inZone), [activeZone]);
   const cctv = useMemo(() => CCTV_LIST.filter(inZone), [activeZone]);
 
-  const cat = CATS[idx];
-  const CatIcon = cat.icon;
-
-  const count = cat.key === 'progress' ? ZONES.length : cat.key === 'equip' ? equip.length : cctv.length;
+  const cat = CATS.find((c) => c.key === summaryCat) ?? CATS[0];
+  const count = summaryCat === 'progress' ? ZONES.length : summaryCat === 'equip' ? equip.length : cctv.length;
   const sub =
-    cat.key === 'progress'
+    summaryCat === 'progress'
       ? { t: `평균 ${Math.round(ZONES.reduce((s, z) => s + z.progress, 0) / ZONES.length)}%`, c: '#a78bfa' }
-      : cat.key === 'equip'
+      : summaryCat === 'equip'
         ? { t: `운행 ${equip.filter((e) => e.status === 'running').length}`, c: '#22c55e' }
         : { t: `가동 ${cctv.filter((c) => c.status === 'online').length}`, c: '#22d3ee' };
 
   return (
     <div className="flex flex-col min-h-0 h-full" style={{ gap: 10 }}>
-      {/* 카테고리 헤더 + 로테이션 인디케이터 */}
-      <div className="flex items-center" style={{ gap: 9 }}>
-        <CatIcon style={{ width: 18, height: 18, color: cat.color }} />
-        <span className="font-black text-slate-200" style={{ fontSize: 15, letterSpacing: '0.02em' }}>{cat.label} 현황</span>
-        <span className="font-black text-white" style={{ fontSize: 15 }}>{count}</span>
-        <span className="font-black" style={{ fontSize: 13, color: sub.c }}>{sub.t}</span>
-        <div className="ml-auto flex items-center" style={{ gap: 6 }}>
-          {CATS.map((c, i) => (
-            <span key={c.key} style={{ width: i === idx ? 20 : 8, height: 7, borderRadius: 999, background: i === idx ? cat.color : 'rgba(148,163,184,0.35)', transition: 'all 0.3s' }} />
-          ))}
-        </div>
+      {/* 탭 + 확장 */}
+      <div className="flex items-center" style={{ gap: 6 }}>
+        {CATS.map((c) => {
+          const on = c.key === summaryCat;
+          const Icon = c.icon;
+          return (
+            <button
+              key={c.key}
+              onClick={() => setSummaryCat(c.key)}
+              className="flex items-center font-black transition-all"
+              style={{ gap: 6, padding: '7px 11px', borderRadius: 9, cursor: 'pointer', fontSize: 13, background: on ? c.color : 'rgba(255,255,255,0.05)', color: on ? '#04121a' : '#cbd5e1', border: `1px solid ${on ? c.color : 'rgba(148,163,184,0.25)'}` }}
+            >
+              <Icon style={{ width: 15, height: 15 }} />
+              {c.label}
+            </button>
+          );
+        })}
+        <button
+          onClick={() => toggleLeftDock('summary')}
+          title="크게 보기"
+          className="ml-auto flex items-center justify-center bg-white/8 hover:bg-white/16 text-slate-200 transition-colors"
+          style={{ width: 32, height: 32, borderRadius: 9 }}
+        >
+          <Maximize2 style={{ width: 16, height: 16 }} />
+        </button>
+      </div>
+
+      {/* 캡션 */}
+      <div className="flex items-center" style={{ gap: 8 }}>
+        <span className="font-black text-white" style={{ fontSize: 14 }}>{count}</span>
+        <span className="text-slate-400 font-bold" style={{ fontSize: 13 }}>{summaryCat === 'progress' ? '개 공구' : '대'}</span>
+        <span className="font-black" style={{ fontSize: 13, color: sub.c }}>· {sub.t}</span>
       </div>
 
       {/* 표 (카테고리별) */}
       <div
-        key={cat.key}
+        key={summaryCat}
         className="fade-in flex-1 min-h-0 overflow-y-auto thin-scroll"
         style={{ borderRadius: 12, background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(148,163,184,0.1)', padding: '8px 6px' }}
       >
         <table className="w-full border-collapse">
-          {cat.key === 'progress' && (
+          {summaryCat === 'progress' && (
             <>
               <thead>
                 <tr>
@@ -112,7 +125,7 @@ export default function HudSummaryTable() {
             </>
           )}
 
-          {cat.key === 'equip' && (
+          {summaryCat === 'equip' && (
             <>
               <thead>
                 <tr>
@@ -140,7 +153,7 @@ export default function HudSummaryTable() {
             </>
           )}
 
-          {cat.key === 'cctv' && (
+          {summaryCat === 'cctv' && (
             <>
               <thead>
                 <tr>

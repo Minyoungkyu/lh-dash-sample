@@ -54,7 +54,7 @@ export default function SmartBandPanel() {
       <div className="flex items-center" style={{ gap: 12 }}>
         <Watch style={{ width: 28, height: 28, color: '#38bdf8' }} />
         <span className="font-black text-cyan-300" style={{ fontSize: 24 }}>
-          스마트밴드 생체 모니터링
+          스마트밴드 현황
         </span>
       </div>
 

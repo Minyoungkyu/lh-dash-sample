@@ -38,10 +38,14 @@ export const useUIStore = create((set) => ({
   toggleDock: (which) => set((s) => ({ dock: s.dock === which ? null : which })),
   closeDock: () => set({ dock: null }),
 
-  // 좌측 접이식 드로어 (공사구역현황 / 실시간이벤트)
-  leftDock: null, // null | 'zones' | 'events'
+  // 좌측 접이식 드로어 — 현장 현황 확장 뷰
+  leftDock: null, // null | 'summary'
   toggleLeftDock: (which) => set((s) => ({ leftDock: s.leftDock === which ? null : which })),
   closeLeftDock: () => set({ leftDock: null }),
+
+  // 좌측 '현장 현황' 요약 카테고리 (탭 전환) — 'progress' | 'equip' | 'cctv'
+  summaryCat: 'progress',
+  setSummaryCat: (c) => set({ summaryCat: c }),
 
   // 지도 구역 스위처 (null = 전체)
   activeZone: null, // null | 'A공구' | ...
@@ -93,6 +97,9 @@ export const useUIStore = create((set) => ({
 
   openEquip: (eq) => set({ selectedEquip: eq }),
   closeEquip: () => set({ selectedEquip: null }),
+
+  // 목록(드로어)에서 항목 클릭 → 지도를 해당 핀으로 이동 (camFocus 재사용)
+  flyToPin: (lng, lat) => set({ camFocus: { lng, lat, nonce: ++focusSeq } }),
 
   // SOS·전체방송도 비상 트리거처럼 기본 상태로 리셋 후 발생
   openSos: (worker) => set({ ...BASE_RESET, sosWorker: worker }),

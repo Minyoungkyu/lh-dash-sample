@@ -31,7 +31,7 @@ export default function SideDock() {
       ref={rootRef}
       className="absolute"
       style={{
-        top: 88, bottom: 24, right: 24, width: DRAWER_W,
+        top: 184, bottom: 24, right: 24, width: DRAWER_W,
         transform: open ? 'translateX(0)' : `translateX(${DRAWER_W + 48}px)`,
         transition: 'transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)',
         zIndex: 4000, pointerEvents: open ? 'auto' : 'none',

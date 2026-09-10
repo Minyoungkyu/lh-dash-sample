@@ -1,4 +1,4 @@
-import { Radio, Siren, Activity, DoorOpen, Wrench, Video, ClipboardCheck, CloudSun, Maximize2 } from 'lucide-react';
+import { Radio, Siren, Activity, DoorOpen, Wrench, Video, ClipboardCheck, CloudSun } from 'lucide-react';
 import { EVENTS } from '@/lib/mock/events';
 import { useUIStore } from '@/stores/useUIStore';
 import HudSummaryTable from './HudSummaryTable';
@@ -18,7 +18,6 @@ const LEVEL = {
 
 export default function HudEvents() {
   const activeZone = useUIStore((s) => s.activeZone);
-  const toggleLeftDock = useUIStore((s) => s.toggleLeftDock);
 
   const list = activeZone ? EVENTS.filter((e) => e.zone === activeZone || e.zone === '전체') : EVENTS;
   const dangerCount = list.filter((e) => e.level === 'danger').length;
@@ -33,19 +32,11 @@ export default function HudEvents() {
         <Radio style={{ width: 24, height: 24, color: '#38bdf8' }} />
         <span className="font-black text-cyan-300" style={{ fontSize: 21 }}>현장 현황</span>
         <span
-          className="font-black"
+          className="ml-auto font-black"
           style={{ fontSize: 14, color: activeZone ? '#38bdf8' : '#94a3b8', background: activeZone ? 'rgba(56,189,248,0.14)' : 'rgba(148,163,184,0.12)', border: `1px solid ${activeZone ? 'rgba(56,189,248,0.4)' : 'rgba(148,163,184,0.25)'}`, padding: '4px 12px', borderRadius: 999 }}
         >
           {activeZone ?? '전체 현장'}
         </span>
-        <button
-          onClick={() => toggleLeftDock('zones')}
-          title="공사구역 상세"
-          className="ml-auto flex items-center justify-center bg-white/8 hover:bg-white/16 text-slate-200 transition-colors"
-          style={{ width: 34, height: 34, borderRadius: 9 }}
-        >
-          <Maximize2 style={{ width: 17, height: 17 }} />
-        </button>
       </div>
 
       {/* 상단: 요약표 자동 롤링 (작업자/장비/CCTV) */}

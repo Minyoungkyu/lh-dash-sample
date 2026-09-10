@@ -103,6 +103,7 @@ body,
 
 /* ---- 지도 핀 (divIcon) ---- */
 .pin-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -114,8 +115,13 @@ body,
   transform: translateY(-10px) scale(1.06);
   z-index: 1000;
 }
+/* 라벨은 헤드 아래로 절대배치 → 헤드 중심이 좌표에 정확히 놓이게(화각 apex 정렬) */
 .pin-label {
-  margin-top: 2px;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 3px;
   font-size: 9px;
   font-weight: 800;
   color: #e2e8f0;
