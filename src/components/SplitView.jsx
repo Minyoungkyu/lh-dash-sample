@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Map as MapIcon, ChevronLeft, ChevronRight, Grid2x2 } from 'lucide-react';
-import { ZONES } from '@/lib/mock/zones';
-import { CCTV_LIST } from '@/lib/mock/cctv';
 import { useUIStore } from '@/stores/useUIStore';
+import { useSiteStore } from '@/stores/useSiteStore';
 import MiniMap from './MiniMap';
 import CctvPopup from '@/components/overlays/CctvPopup';
 import EquipPopup from '@/components/overlays/EquipPopup';
@@ -22,6 +21,8 @@ export default function SplitView() {
   const cellPopups = useUIStore((s) => s.cellPopups);
   const closeCellPopup = useUIStore((s) => s.closeCellPopup);
   const openCellPopup = useUIStore((s) => s.openCellPopup);
+  const zones = useSiteStore((s) => s.zones);
+  const cctvs = useSiteStore((s) => s.cctvs);
   const containerRef = useRef(null);
 
   // #map-slot 위치/크기 추적
@@ -46,8 +47,8 @@ export default function SplitView() {
 
   if (!splitView) return null;
 
-  const totalPages = Math.ceil(ZONES.length / PER_PAGE);
-  const pageZones = ZONES.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+  const totalPages = Math.ceil(zones.length / PER_PAGE);
+  const pageZones = zones.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
   const cells = [...pageZones];
   while (cells.length < PER_PAGE) cells.push(null); // 빈 칸 패딩
 
@@ -94,7 +95,7 @@ export default function SplitView() {
                 <CctvPopup
                   inCell
                   cam={cellPopups[z.id].item}
-                  list={CCTV_LIST.filter((c) => c.zone === z.id)}
+                  list={cctvs.filter((c) => c.zone === z.id)}
                   onClose={() => closeCellPopup(z.id)}
                   onSelect={(c) => openCellPopup(z.id, 'cctv', c)}
                 />

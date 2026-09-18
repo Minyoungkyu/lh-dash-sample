@@ -17,5 +17,9 @@ export default defineConfig({
   server: {
     host: true,
     port: 5274,
+    // /api/* → Node 백엔드(:3001) 프록시 (CORS 우회 + 키 서버측 보관)
+    proxy: {
+      '/api': { target: 'http://localhost:3001', changeOrigin: true },
+    },
   },
 });

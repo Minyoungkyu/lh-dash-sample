@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, Video, VideoOff, Rotate3d, Camera, UserX, Flame, HardHat, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useUIStore } from '@/stores/useUIStore';
-import { CCTV_LIST, CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
+import { useSiteStore } from '@/stores/useSiteStore';
+import { CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
 import TtsComposer from '@/components/TtsComposer';
+import HlsVideo from '@/components/HlsVideo';
 
 // 비상상황 아이콘 매핑
 const EMG_ICON = { user: UserX, flame: Flame, hardhat: HardHat, shield: ShieldAlert };
@@ -21,10 +23,11 @@ export default function CctvPopup({ inCell = false, cam: camProp, list, onClose,
   const splitView = useUIStore((s) => s.splitView);
   const emergencyAlert = useUIStore((s) => s.emergencyAlert);
   const pushToast = useUIStore((s) => s.pushToast);
+  const allCctvs = useSiteStore((s) => s.cctvs);
 
   // inCell 이면 칸이 넘겨준 cam/list/콜백을 사용, 아니면 전역 스토어
   const cam = camProp ?? selectedCctv;
-  const cams = list ?? CCTV_LIST;
+  const cams = list ?? allCctvs;
   const close = onClose ?? closeCctv;
   const select = onSelect ?? openCctv;
 
@@ -192,24 +195,28 @@ export default function CctvPopup({ inCell = false, cam: camProp, list, onClose,
               </span>
             </div>
           )}
-          {/* 목업 영상 자리 */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ gap: 12 }}>
-            {online ? (
-              <>
-                <Video style={{ width: 64, height: 64, color: 'rgba(148,163,184,0.5)' }} />
-                <span className="text-slate-500 font-bold" style={{ fontSize: 16 }}>
-                  실시간 영상 (목업 · 스트림 미연결)
-                </span>
-              </>
-            ) : (
-              <>
-                <VideoOff style={{ width: 64, height: 64, color: 'rgba(148,163,184,0.4)' }} />
-                <span className="text-slate-500 font-bold" style={{ fontSize: 16 }}>
-                  오프라인 — 신호 없음
-                </span>
-              </>
-            )}
-          </div>
+          {/* 영상: streamUrl 있으면 실제 HLS 재생, 없으면 플레이스홀더 */}
+          {online && cam.streamUrl ? (
+            <HlsVideo src={cam.streamUrl} style={{ position: 'absolute', inset: 0 }} />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ gap: 12 }}>
+              {online ? (
+                <>
+                  <Video style={{ width: 64, height: 64, color: 'rgba(148,163,184,0.5)' }} />
+                  <span className="text-slate-500 font-bold" style={{ fontSize: 16 }}>
+                    실시간 영상 (스트림 미등록)
+                  </span>
+                </>
+              ) : (
+                <>
+                  <VideoOff style={{ width: 64, height: 64, color: 'rgba(148,163,184,0.4)' }} />
+                  <span className="text-slate-500 font-bold" style={{ fontSize: 16 }}>
+                    오프라인 — 신호 없음
+                  </span>
+                </>
+              )}
+            </div>
+          )}
           {/* 하단 위치 라벨 */}
           <div
             className="absolute font-bold text-white/80"

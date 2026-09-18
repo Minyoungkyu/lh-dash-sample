@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { X, Radio, MapPin } from 'lucide-react';
 import { useUIStore } from '@/stores/useUIStore';
-import { CCTV_LIST } from '@/lib/mock/cctv';
+import { useSiteStore } from '@/stores/useSiteStore';
 import TtsComposer from '@/components/TtsComposer';
 
 /**
@@ -11,6 +11,7 @@ import TtsComposer from '@/components/TtsComposer';
 export default function GlobalBroadcastModal() {
   const open = useUIStore((s) => s.broadcastOpen);
   const close = useUIStore((s) => s.closeBroadcast);
+  const cctvs = useSiteStore((s) => s.cctvs);
 
   useEffect(() => {
     if (!open) return;
@@ -21,7 +22,7 @@ export default function GlobalBroadcastModal() {
 
   if (!open) return null;
 
-  const speakers = CCTV_LIST.filter((c) => c.hasSpeaker && c.status === 'online');
+  const speakers = cctvs.filter((c) => c.hasSpeaker && c.status === 'online');
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { Sun, CloudSun, CloudRain, Cloud, Wind, Waves, Droplets, ChevronRight, CloudDrizzle } from 'lucide-react';
+import { Sun, CloudSun, CloudRain, Cloud, Wind, Droplets, ChevronRight, CloudDrizzle } from 'lucide-react';
 import { useWeather } from '@/lib/mock/weather';
 import { useUIStore } from '@/stores/useUIStore';
 
@@ -89,37 +89,21 @@ export default function WeatherPanel() {
         </div>
       </Section>
 
-      {/* 풍향 / 파고 */}
-      <div className="grid grid-cols-2" style={{ gap: 12 }}>
-        <Card>
-          <div className="flex items-center" style={{ gap: 12 }}>
-            <Wind style={{ width: 30, height: 30, color: '#38bdf8' }} />
-            <div className="flex flex-col">
-              <span className="font-black text-white" style={{ fontSize: 22 }}>
-                {current.wind.directionLabel} {current.wind.speedMs.toFixed(1)}
-                <span style={{ fontSize: 15, marginLeft: 3 }}>m/s</span>
-              </span>
-              <span className="text-slate-400 font-bold" style={{ fontSize: 14 }}>
-                풍향 / 풍속
-              </span>
-            </div>
+      {/* 풍향 / 풍속 */}
+      <Card>
+        <div className="flex items-center" style={{ gap: 12 }}>
+          <Wind style={{ width: 30, height: 30, color: '#38bdf8' }} />
+          <div className="flex flex-col">
+            <span className="font-black text-white" style={{ fontSize: 22 }}>
+              {current.wind.directionLabel} {(current.wind.speedMs ?? 0).toFixed(1)}
+              <span style={{ fontSize: 15, marginLeft: 3 }}>m/s</span>
+            </span>
+            <span className="text-slate-400 font-bold" style={{ fontSize: 14 }}>
+              풍향 / 풍속
+            </span>
           </div>
-        </Card>
-        <Card>
-          <div className="flex items-center" style={{ gap: 12 }}>
-            <Waves style={{ width: 30, height: 30, color: '#60a5fa' }} />
-            <div className="flex flex-col">
-              <span className="font-black text-white" style={{ fontSize: 22 }}>
-                {current.waveM}
-                <span style={{ fontSize: 15, marginLeft: 3 }}>m</span>
-              </span>
-              <span className="text-slate-400 font-bold" style={{ fontSize: 14 }}>
-                해상 파고
-              </span>
-            </div>
-          </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
 
       {/* 체감온도계 (클릭 → 상세) */}
       <Section title="체감온도계">

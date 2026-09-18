@@ -1,4 +1,4 @@
-import { Sun, CloudSun, CloudRain, Cloud, Droplets, Wind, Waves, Maximize2 } from 'lucide-react';
+import { Sun, CloudSun, CloudRain, Cloud, Droplets, Wind, Maximize2 } from 'lucide-react';
 import { useWeather } from '@/lib/mock/weather';
 import { useUIStore } from '@/stores/useUIStore';
 
@@ -91,10 +91,9 @@ export default function HudWeather() {
 
       <Divider />
 
-      {/* 습도 / 풍향 / 파고 */}
-      <MiniStat icon={Droplets} color="#38bdf8" value={c.humidityPct} unit="%" label="습도" />
-      <MiniStat icon={Wind} color="#38bdf8" value={`${c.wind.directionLabel} ${c.wind.speedMs.toFixed(1)}`} unit="m/s" label="풍향 / 풍속" />
-      <MiniStat icon={Waves} color="#60a5fa" value={c.waveM} unit="m" label="해상 파고" />
+      {/* 습도 / 풍향 */}
+      <MiniStat icon={Droplets} color="#38bdf8" value={c.humidityPct ?? '--'} unit="%" label="습도" />
+      <MiniStat icon={Wind} color="#38bdf8" value={`${c.wind.directionLabel} ${(c.wind.speedMs ?? 0).toFixed(1)}`} unit="m/s" label="풍향 / 풍속" />
 
       <Divider />
 

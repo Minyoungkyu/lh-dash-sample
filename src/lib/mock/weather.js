@@ -1,9 +1,8 @@
+import { create } from 'zustand';
+
 /**
- * 날씨 목업 데이터 — 샘플 대시보드 /api/weather 응답 shape 를 그대로 이식.
- * (WeatherPanel / FeelsLikeModal 의 로직·계산식 재사용을 위해 필드 구조 유지)
- *
- * 그룹: current / forecast / rainHourly / trafficLight
- * 오늘(2026-08-21) 기준 → 여름철(summer) 척도.
+ * 날씨 데이터 — 실서버(/api/weather, 동탄 실시간)에서 가져오고,
+ * 실패 시 아래 WEATHER 목업으로 폴백. shape 는 동일.
  */
 export const WEATHER = {
   current: {
@@ -55,7 +54,26 @@ export const WEATHER = {
   },
 };
 
-// 샘플의 useWeather() 훅 대체 — 목업이라 정적 객체를 그대로 반환.
-export function useWeather() {
-  return WEATHER;
+// 실데이터 스토어 — 초기값은 목업, 로드 후 실서버 데이터로 교체.
+const useWeatherStore = create(() => ({ data: WEATHER, source: 'mock' }));
+
+async function refreshWeather() {
+  try {
+    const r = await fetch('/api/weather');
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d && d.current) useWeatherStore.setState({ data: d, source: d.source || 'live' });
+  } catch {
+    /* 네트워크/서버 오류 시 마지막 데이터(초기엔 목업) 유지 */
+  }
 }
+
+if (typeof window !== 'undefined') {
+  refreshWeather();
+  setInterval(refreshWeather, 60000); // 60초 폴링
+}
+
+export function useWeather() {
+  return useWeatherStore((s) => s.data);
+}
+

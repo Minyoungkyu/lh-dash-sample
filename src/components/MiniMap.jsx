@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import { TILE } from '@/lib/mock/site';
-import { CCTV_LIST } from '@/lib/mock/cctv';
 import { EQUIP_LIST } from '@/lib/mock/equipment';
 import { cctvEl, equipEl } from '@/components/map/pinIcons';
 import { useUIStore } from '@/stores/useUIStore';
+import { useSiteStore } from '@/stores/useSiteStore';
 
 /**
  * MiniMap — 분할 뷰 한 칸. 특정 공구를 중심으로 한 독립 MapLibre 인스턴스(하이브리드).
@@ -51,7 +51,7 @@ export default function MiniMap({ zone }) {
       map.fitBounds([[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]], { padding: 20, duration: 0, maxZoom: 16.5 });
 
       // 이 공구의 마커만
-      CCTV_LIST.filter((c) => c.zone === zone.id).forEach((cam) => {
+      useSiteStore.getState().cctvs.filter((c) => c.zone === zone.id).forEach((cam) => {
         const el = cctvEl(cam);
         el.addEventListener('mousedown', (e) => e.stopPropagation());
         el.onclick = (e) => {

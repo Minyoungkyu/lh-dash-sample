@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { CCTV_LIST } from '@/lib/mock/cctv';
 import { EMERGENCIES } from '@/lib/mock/emergency';
+import { useSiteStore } from '@/stores/useSiteStore';
 
 /**
  * 전역 UI 상태 — 팝업/모달 오픈 상태, 선택 대상, 토스트.
@@ -25,7 +25,7 @@ const BASE_RESET = {
   sosWorker: null,
 };
 
-export const useUIStore = create((set) => ({
+export const useUIStore = create((set, get) => ({
   // ── 선택된 대상 / 열림 상태 ─────────────────────────────
   selectedCctv: null, // CCTV 재생 팝업 (#2,#3)
   selectedEquip: null, // 중장비 팝업 (#7)
@@ -46,6 +46,53 @@ export const useUIStore = create((set) => ({
   // 좌측 '현장 현황' 요약 카테고리 (탭 전환) — 'progress' | 'equip' | 'cctv'
   summaryCat: 'progress',
   setSummaryCat: (c) => set({ summaryCat: c }),
+
+  // ── 편집모드 (구역/CCTV 편집) ─────────────────────────
+  editMode: false,
+  editTool: null, // null | 'draw-zone' | 'place-cctv'
+  // 진입 시 드로어·팝업 등 일반 상호작용을 닫고 잠근다. 해제 시 도구 초기화.
+  toggleEditMode: () => set((s) => (s.editMode ? { editMode: false, editTool: null, draftZone: null, cctvForm: null, zoneEdit: null } : { ...BASE_RESET, editMode: true, editTool: null, draftZone: null, cctvForm: null, zoneEdit: null })),
+  setEditTool: (t) => set((s) => ({ editTool: s.editTool === t ? null : t, zoneEdit: null })),
+
+  // ── 편집: 구역 그리기 드래프트 ─────────────────────────
+  draftZone: null, // { name, color, points: [[lat,lng]...] }
+  startDrawZone: (name, color) => set({ draftZone: { name: name || '새 구역', color: color || '#38bdf8', points: [] }, editTool: 'draw-zone', zoneEdit: null }),
+  addDraftPoint: (lat, lng) => set((s) => (s.draftZone ? { draftZone: { ...s.draftZone, points: [...s.draftZone.points, [lat, lng]] } } : {})),
+  undoDraftPoint: () => set((s) => (s.draftZone ? { draftZone: { ...s.draftZone, points: s.draftZone.points.slice(0, -1) } } : {})),
+  cancelDraftZone: () => set({ draftZone: null, editTool: null }),
+  finishDraftZone: () => {
+    const d = get().draftZone;
+    if (!d || d.points.length < 3) return;
+    const lats = d.points.map((p) => p[0]);
+    const lngs = d.points.map((p) => p[1]);
+    const center = [lats.reduce((a, b) => a + b, 0) / lats.length, lngs.reduce((a, b) => a + b, 0) / lngs.length];
+    useSiteStore.getState().addZone({ name: d.name, color: d.color, polygon: d.points, center, phase: '신규 구역', progress: 0 });
+    set({ draftZone: null, editTool: null });
+  },
+
+  // ── 편집: CCTV 배치/수정 폼 ─────────────────────────
+  cctvForm: null, // { mode:'create'|'edit', id?, lat, lng, name, loc, zone, type, status, hasSpeaker, streamUrl }
+  openCctvForm: (form) => set({ cctvForm: form, editTool: null }),
+  updateCctvForm: (patch) => set((s) => ({ cctvForm: s.cctvForm ? { ...s.cctvForm, ...patch } : null })),
+  closeCctvForm: () => set({ cctvForm: null }),
+  saveCctvForm: () => {
+    const f = get().cctvForm;
+    if (!f) return;
+    const data = {
+      name: f.name || 'CCTV', loc: f.loc || '', zone: f.zone || '', type: f.type || 'fixed',
+      status: f.status || 'online', hasSpeaker: !!f.hasSpeaker, streamUrl: f.streamUrl || '', lat: f.lat, lng: f.lng,
+    };
+    const site = useSiteStore.getState();
+    if (f.mode === 'edit' && f.id) site.updateCctv(f.id, data);
+    else site.addCctv(data);
+    set({ cctvForm: null });
+  },
+  deleteCctv: (id) => { useSiteStore.getState().removeCctv(id); set({ cctvForm: null }); },
+
+  // ── 편집: 구역 선택(수정/삭제) ─────────────────────────
+  zoneEdit: null, // { id }
+  selectZoneEdit: (id) => set({ zoneEdit: { id } }),
+  closeZoneEdit: () => set({ zoneEdit: null }),
 
   // 지도 구역 스위처 (null = 전체)
   activeZone: null, // null | 'A공구' | ...
@@ -84,7 +131,7 @@ export const useUIStore = create((set) => ({
   triggerEmergency: (type) => {
     const cfg = EMERGENCIES[type];
     if (!cfg) return;
-    const cam = CCTV_LIST.find((c) => c.id === cfg.camId);
+    const cam = useSiteStore.getState().cctvs.find((c) => c.id === cfg.camId);
     if (!cam) return;
     set({
       ...BASE_RESET, // 기본 지도 상태로 강제 복귀

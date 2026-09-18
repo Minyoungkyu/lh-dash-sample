@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { BarChart3, Wrench, Video, Volume2, VolumeX, Maximize2 } from 'lucide-react';
-import { ZONES } from '@/lib/mock/zones';
 import { EQUIP_LIST, EQUIP_STATUS, EQUIP_KIND_LABEL } from '@/lib/mock/equipment';
-import { CCTV_LIST, CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
+import { CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
 import { useUIStore } from '@/stores/useUIStore';
+import { useSiteStore } from '@/stores/useSiteStore';
 
 /**
  * HudSummaryTable — 공정 진행 / 중장비 / CCTV 요약표. 탭 버튼으로 수동 전환.
@@ -36,16 +36,18 @@ export default function HudSummaryTable() {
   const summaryCat = useUIStore((s) => s.summaryCat);
   const setSummaryCat = useUIStore((s) => s.setSummaryCat);
   const toggleLeftDock = useUIStore((s) => s.toggleLeftDock);
+  const zones = useSiteStore((s) => s.zones);
+  const cctvs = useSiteStore((s) => s.cctvs);
 
   const inZone = (x) => (activeZone ? x.zone === activeZone : true);
   const equip = useMemo(() => EQUIP_LIST.filter(inZone), [activeZone]);
-  const cctv = useMemo(() => CCTV_LIST.filter(inZone), [activeZone]);
+  const cctv = useMemo(() => cctvs.filter(inZone), [activeZone, cctvs]);
 
   const cat = CATS.find((c) => c.key === summaryCat) ?? CATS[0];
-  const count = summaryCat === 'progress' ? ZONES.length : summaryCat === 'equip' ? equip.length : cctv.length;
+  const count = summaryCat === 'progress' ? zones.length : summaryCat === 'equip' ? equip.length : cctv.length;
   const sub =
     summaryCat === 'progress'
-      ? { t: `평균 ${Math.round(ZONES.reduce((s, z) => s + z.progress, 0) / ZONES.length)}%`, c: '#a78bfa' }
+      ? { t: `평균 ${Math.round(zones.reduce((s, z) => s + z.progress, 0) / zones.length)}%`, c: '#a78bfa' }
       : summaryCat === 'equip'
         ? { t: `운행 ${equip.filter((e) => e.status === 'running').length}`, c: '#22c55e' }
         : { t: `가동 ${cctv.filter((c) => c.status === 'online').length}`, c: '#22d3ee' };
@@ -103,7 +105,7 @@ export default function HudSummaryTable() {
                 </tr>
               </thead>
               <tbody>
-                {ZONES.map((z) => {
+                {zones.map((z) => {
                   const color = z.color ?? '#38bdf8';
                   const active = activeZone === z.id;
                   return (

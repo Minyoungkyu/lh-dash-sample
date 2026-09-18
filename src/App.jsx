@@ -7,6 +7,7 @@ import LeftDock from '@/components/LeftDock';
 import SideDock from '@/components/SideDock';
 import FeelsLikeModal from '@/sections/WeatherPanel/FeelsLikeModal';
 import CctvPopup from '@/components/overlays/CctvPopup';
+import CctvEditModal from '@/components/overlays/CctvEditModal';
 import EquipPopup from '@/components/overlays/EquipPopup';
 import GlobalBroadcastModal from '@/components/overlays/GlobalBroadcastModal';
 import SosAlertPopup from '@/components/overlays/SosAlertPopup';
@@ -47,6 +48,7 @@ export default function App() {
           {/* 오버레이 — 래퍼 auto (자식 backdrop 이 상속). 래퍼 자체는 0크기라 지도 안 가림 */}
           <div style={{ pointerEvents: 'auto' }}>
             <CctvPopup />
+            <CctvEditModal />
             <EquipPopup />
             <GlobalBroadcastModal />
             <SosAlertPopup />

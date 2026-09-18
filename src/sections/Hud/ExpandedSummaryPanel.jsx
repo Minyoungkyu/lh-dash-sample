@@ -1,7 +1,8 @@
 import { Wrench, Video, Volume2, VolumeX } from 'lucide-react';
 import { EQUIP_LIST, EQUIP_STATUS, EQUIP_KIND_LABEL, COMM_STATUS } from '@/lib/mock/equipment';
-import { CCTV_LIST, CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
+import { CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
 import { useUIStore } from '@/stores/useUIStore';
+import { useSiteStore } from '@/stores/useSiteStore';
 import ZoneSummaryPanel from '@/sections/ZoneSummaryPanel';
 
 /**
@@ -34,6 +35,7 @@ export default function ExpandedSummaryPanel() {
   const activeZone = useUIStore((s) => s.activeZone);
   const flyToPin = useUIStore((s) => s.flyToPin);
   const closeLeftDock = useUIStore((s) => s.closeLeftDock);
+  const cctvs = useSiteStore((s) => s.cctvs);
 
   // 공정 진행 = 원래 드로어(공사구역 현황 카드) 그대로
   if (summaryCat === 'progress') return <ZoneSummaryPanel />;
@@ -42,7 +44,7 @@ export default function ExpandedSummaryPanel() {
   const Icon = m.icon;
   const inZone = (x) => (activeZone ? x.zone === activeZone : true);
   const equip = EQUIP_LIST.filter(inZone);
-  const cctv = CCTV_LIST.filter(inZone);
+  const cctv = cctvs.filter(inZone);
   const headCount = summaryCat === 'equip' ? `${equip.length}대` : `${cctv.length}대`;
 
   // 행 클릭 → 드로어 닫고 해당 핀으로 지도 이동

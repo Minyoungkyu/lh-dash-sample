@@ -1,6 +1,6 @@
 import { Layers, Grid2x2 } from 'lucide-react';
-import { ZONES } from '@/lib/mock/zones';
 import { useUIStore } from '@/stores/useUIStore';
+import { useSiteStore } from '@/stores/useSiteStore';
 
 /**
  * ZoneSwitcher — 지도 우상단 구역 스위처.
@@ -12,6 +12,7 @@ export default function ZoneSwitcher() {
   const setActiveZone = useUIStore((s) => s.setActiveZone);
   const splitView = useUIStore((s) => s.splitView);
   const toggleSplitView = useUIStore((s) => s.toggleSplitView);
+  const zones = useSiteStore((s) => s.zones);
 
   return (
     <div className="absolute z-[500] flex items-center panel" style={{ top: 20, right: 24, gap: 8, padding: 10, borderRadius: 14, pointerEvents: 'auto' }}>
@@ -28,7 +29,7 @@ export default function ZoneSwitcher() {
       >
         전체
       </button>
-      {ZONES.map((z) => {
+      {zones.map((z) => {
         const color = z.color ?? '#38bdf8';
         const on = activeZone === z.id;
         return (
