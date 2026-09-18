@@ -98,6 +98,7 @@ export default function MapLayer() {
   const fovRafRef = useRef(null);
   const zoneMarkersRef = useRef([]);
   const cctvMarkersRef = useRef([]);
+  const didFitRef = useRef(false);
   const [ready, setReady] = useState(false);
 
   const zones = useSiteStore((s) => s.zones);
@@ -219,7 +220,8 @@ export default function MapLayer() {
       });
 
       setReady(true);
-      map.fitBounds(boundsOf(zs.flatMap((z) => z.polygon)), { padding: 100, duration: 0 });
+      const pts0 = zs.flatMap((z) => z.polygon || []);
+      if (pts0.length) map.fitBounds(boundsOf(pts0), { padding: 100, duration: 0 });
     });
 
     // 초기 렌더 킥
@@ -274,6 +276,11 @@ export default function MapLayer() {
     if (!map || !ready) return;
     const src = map.getSource('zones');
     if (src) src.setData(zoneGeoJSON(zones, activeZone));
+    // 최초 구역 로드 시 1회 전체 프레이밍 (비동기 로드로 지도 생성 시점엔 비어있을 수 있음)
+    if (!didFitRef.current && !activeZone) {
+      const pts = zones.flatMap((z) => z.polygon || []);
+      if (pts.length) { map.fitBounds(boundsOf(pts), { padding: 100, duration: 0 }); didFitRef.current = true; }
+    }
   }, [zones, activeZone, ready]);
 
   // 구역 라벨 마커 (구역 데이터 변경 시 재생성)
