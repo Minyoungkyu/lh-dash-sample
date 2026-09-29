@@ -71,6 +71,10 @@ export default function EditControls() {
           <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && name.trim()) startDrawZone(name.trim(), color); }} autoFocus placeholder="공구명 입력" className="text-white outline-none" style={{ fontSize: 19, padding: '13px 18px', borderRadius: 11, background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(148,163,184,0.4)', width: 240 }} />
           <div className="flex items-center" style={{ gap: 8 }}>
             {PALETTE.map((c) => (<button key={c} onClick={() => setColor(c)} style={{ width: 30, height: 30, borderRadius: 8, background: c, border: color === c ? '3px solid #fff' : '2px solid rgba(255,255,255,0.3)', cursor: 'pointer' }} />))}
+            <label title="색상 직접 선택" style={{ position: 'relative', width: 30, height: 30, borderRadius: 8, cursor: 'pointer', background: color, border: PALETTE.includes(color) ? '2px solid rgba(255,255,255,0.3)' : '3px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 15, fontWeight: 900, color: '#fff', mixBlendMode: 'difference' }}>+</span>
+              <input type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+            </label>
           </div>
           <Divider />
           <button onClick={() => name.trim() && startDrawZone(name.trim(), color)} disabled={!name.trim()} className="flex items-center font-black transition-all disabled:opacity-40" style={{ gap: 9, padding: '13px 22px', borderRadius: 11, fontSize: 18, background: '#38bdf8', color: '#04121a', cursor: name.trim() ? 'pointer' : 'default' }}><Pencil style={{ width: 22, height: 22 }} /> 그리기 시작</button>

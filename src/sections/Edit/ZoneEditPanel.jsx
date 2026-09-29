@@ -46,6 +46,10 @@ export default function ZoneEditPanel() {
         <span className="text-slate-400 font-bold" style={{ fontSize: 17 }}>색상</span>
         <div className="flex items-center" style={{ gap: 10 }}>
           {PALETTE.map((c) => (<button key={c} onClick={() => updateZone(z.id, { color: c })} style={{ width: 36, height: 36, borderRadius: 9, background: c, border: z.color === c ? '3px solid #fff' : '2px solid rgba(255,255,255,0.3)', cursor: 'pointer' }} />))}
+          <label title="색상 직접 선택" style={{ position: 'relative', width: 36, height: 36, borderRadius: 9, cursor: 'pointer', background: z.color || '#38bdf8', border: PALETTE.includes(z.color) ? '2px solid rgba(255,255,255,0.3)' : '3px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: 16, fontWeight: 900, color: '#fff', mixBlendMode: 'difference' }}>+</span>
+            <input type="color" value={z.color || '#38bdf8'} onChange={(e) => updateZone(z.id, { color: e.target.value })} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+          </label>
         </div>
       </div>
 
