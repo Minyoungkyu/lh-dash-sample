@@ -1,5 +1,6 @@
 import FourKStage from '@/components/FourKStage';
 import MapLayer from '@/components/MapLayer';
+import LoadingOverlay from '@/components/LoadingOverlay';
 import Header from '@/sections/Header';
 import MapPanel from '@/sections/MapPanel';
 import SplitView from '@/components/SplitView';
@@ -11,6 +12,7 @@ import CctvEditModal from '@/components/overlays/CctvEditModal';
 import EquipPopup from '@/components/overlays/EquipPopup';
 import GlobalBroadcastModal from '@/components/overlays/GlobalBroadcastModal';
 import SosAlertPopup from '@/components/overlays/SosAlertPopup';
+import ConfirmDialog from '@/components/overlays/ConfirmDialog';
 import ToastHost from '@/components/ToastHost';
 
 /**
@@ -23,6 +25,8 @@ import ToastHost from '@/components/ToastHost';
 export default function App() {
   return (
     <>
+      {/* 초기/재기동 데이터 준비 전 로딩 오버레이 */}
+      <LoadingOverlay />
       {/* 뒤: 실제 지도 (스케일 밖) */}
       <MapLayer />
       {/* 4분할 뷰 (스케일 밖, on 일 때만 지도 생성) */}
@@ -53,6 +57,7 @@ export default function App() {
             <GlobalBroadcastModal />
             <SosAlertPopup />
             <FeelsLikeModal />
+            <ConfirmDialog />
             <ToastHost />
           </div>
         </div>

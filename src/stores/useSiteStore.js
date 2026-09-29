@@ -52,18 +52,23 @@ export const useSiteStore = create((set) => ({
   moveCctv: (id, lng, lat) => { set((s) => ({ cctvs: s.cctvs.map((c) => (c.id === id ? { ...c, lng, lat } : c)) })); api.patch(`/api/cctv/${id}`, { lng, lat }); },
   removeCctv: (id) => { set((s) => ({ cctvs: s.cctvs.filter((c) => c.id !== id) })); api.del(`/api/cctv/${id}`); },
 
-  // ── 초기 로드 ──
+  // ── 초기 로드 (재기동 대비: 준비될 때까지 재시도 후 폴백) ──
   load: async () => {
-    try {
-      const [zones, cctvs] = await Promise.all([api.get('/api/zones'), api.get('/api/cctv')]);
-      zoneSeq = Math.max(1000, maxNum(zones, 'Z-'));
-      camSeq = Math.max(maxNum(cctvs, 'CAM-'), 0);
-      set({ zones, cctvs, loaded: true });
-    } catch {
-      zoneSeq = 1000;
-      camSeq = maxNum(SEED_CCTV, 'CAM-');
-      set({ zones: clone(SEED_ZONES), cctvs: clone(SEED_CCTV), loaded: true });
+    for (let i = 0; i < 12; i++) {
+      try {
+        const [zones, cctvs] = await Promise.all([api.get('/api/zones'), api.get('/api/cctv')]);
+        zoneSeq = Math.max(1000, maxNum(zones, 'Z-'));
+        camSeq = Math.max(maxNum(cctvs, 'CAM-'), 0);
+        set({ zones, cctvs, loaded: true });
+        return;
+      } catch {
+        await new Promise((r) => setTimeout(r, 1500));
+      }
     }
+    // 서버 응답 없으면 목업으로 진행(편집 저장은 안 됨)
+    zoneSeq = 1000;
+    camSeq = maxNum(SEED_CCTV, 'CAM-');
+    set({ zones: clone(SEED_ZONES), cctvs: clone(SEED_CCTV), loaded: true });
   },
 }));
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ZoomIn, ZoomOut, Maximize2, Expand } from 'lucide-react';
+import { SHOW_ZOOM_CONTROL } from '@/lib/uiConfig';
 
 /**
  * FourKStage — 3840×2160 고정 캔버스 뷰어.
@@ -68,7 +69,8 @@ export default function FourKStage({ children }) {
         </div>
       </div>
 
-      {/* 줌 컨트롤 (뷰포트 고정) */}
+      {/* 줌 컨트롤 (뷰포트 고정) — 실운영 숨김 */}
+      {SHOW_ZOOM_CONTROL && (
       <div className="fixed flex items-center panel" style={{ right: 20, bottom: 20, gap: 4, padding: 8, borderRadius: 14, zIndex: 9500, pointerEvents: 'auto' }}>
         <ZoomBtn onClick={() => zoomBy(1 / 1.25)} title="축소" disabled={zoom <= 1}>
           <ZoomOut style={{ width: 22, height: 22 }} />
@@ -85,6 +87,7 @@ export default function FourKStage({ children }) {
           <Expand style={{ width: 20, height: 20 }} />
         </ZoomBtn>
       </div>
+      )}
     </div>
   );
 }

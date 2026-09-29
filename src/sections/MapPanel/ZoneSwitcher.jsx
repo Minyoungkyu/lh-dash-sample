@@ -21,7 +21,7 @@ export default function ZoneSwitcher() {
         onClick={() => setActiveZone(null)}
         className="font-black transition-all"
         style={{
-          fontSize: 16, padding: '9px 16px', borderRadius: 10, cursor: 'pointer',
+          fontSize: 18, padding: '9px 16px', borderRadius: 10, cursor: 'pointer',
           background: activeZone === null ? '#38bdf8' : 'rgba(255,255,255,0.06)',
           color: activeZone === null ? '#04121a' : '#e2e8f0',
           border: '1px solid rgba(56,189,248,0.35)',
@@ -38,7 +38,7 @@ export default function ZoneSwitcher() {
             onClick={() => setActiveZone(z.id)}
             className="font-black transition-all"
             style={{
-              fontSize: 16, padding: '9px 16px', borderRadius: 10, cursor: 'pointer',
+              fontSize: 18, padding: '9px 16px', borderRadius: 10, cursor: 'pointer',
               background: on ? color : 'rgba(255,255,255,0.06)',
               color: on ? '#04121a' : '#e2e8f0',
               border: `1px solid ${color}66`,
@@ -53,7 +53,7 @@ export default function ZoneSwitcher() {
         onClick={toggleSplitView}
         title="공구별 4분할 관제"
         className="flex items-center font-black transition-all"
-        style={{ gap: 6, fontSize: 15, padding: '9px 14px', borderRadius: 10, cursor: 'pointer', background: splitView ? '#38bdf8' : 'rgba(255,255,255,0.06)', color: splitView ? '#04121a' : '#e2e8f0', border: '1px solid rgba(56,189,248,0.35)' }}
+        style={{ gap: 6, fontSize: 17, padding: '9px 14px', borderRadius: 10, cursor: 'pointer', background: splitView ? '#38bdf8' : 'rgba(255,255,255,0.06)', color: splitView ? '#04121a' : '#e2e8f0', border: '1px solid rgba(56,189,248,0.35)' }}
       >
         <Grid2x2 style={{ width: 18, height: 18 }} />
         4분할

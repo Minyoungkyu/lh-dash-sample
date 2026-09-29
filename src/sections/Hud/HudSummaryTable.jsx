@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { BarChart3, Wrench, Video, Volume2, VolumeX, Maximize2 } from 'lucide-react';
 import { EQUIP_LIST, EQUIP_STATUS, EQUIP_KIND_LABEL } from '@/lib/mock/equipment';
-import { CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
+import { cctvKindLabel } from '@/lib/mock/cctv';
 import { useUIStore } from '@/stores/useUIStore';
 import { useSiteStore } from '@/stores/useSiteStore';
 
@@ -17,12 +17,12 @@ const CATS = [
 ];
 
 const Th = ({ children, w, right }) => (
-  <th className="text-slate-500 font-bold" style={{ fontSize: 12, padding: '0 10px 8px', textAlign: right ? 'right' : 'left', width: w, whiteSpace: 'nowrap' }}>
+  <th className="text-slate-500 font-bold" style={{ fontSize: 14, padding: '0 10px 8px', textAlign: right ? 'right' : 'left', width: w, whiteSpace: 'nowrap' }}>
     {children}
   </th>
 );
 const Td = ({ children, right, color }) => (
-  <td className="font-bold" style={{ fontSize: 13, padding: '9px 10px', textAlign: right ? 'right' : 'left', color: color ?? '#e2e8f0', whiteSpace: 'nowrap' }}>
+  <td className="font-bold" style={{ fontSize: 15, padding: '9px 10px', textAlign: right ? 'right' : 'left', color: color ?? '#e2e8f0', whiteSpace: 'nowrap' }}>
     {children}
   </td>
 );
@@ -64,7 +64,7 @@ export default function HudSummaryTable() {
               key={c.key}
               onClick={() => setSummaryCat(c.key)}
               className="flex items-center font-black transition-all"
-              style={{ gap: 6, padding: '7px 11px', borderRadius: 9, cursor: 'pointer', fontSize: 13, background: on ? c.color : 'rgba(255,255,255,0.05)', color: on ? '#04121a' : '#cbd5e1', border: `1px solid ${on ? c.color : 'rgba(148,163,184,0.25)'}` }}
+              style={{ gap: 6, padding: '7px 11px', borderRadius: 9, cursor: 'pointer', fontSize: 15, background: on ? c.color : 'rgba(255,255,255,0.05)', color: on ? '#04121a' : '#cbd5e1', border: `1px solid ${on ? c.color : 'rgba(148,163,184,0.25)'}` }}
             >
               <Icon style={{ width: 15, height: 15 }} />
               {c.label}
@@ -83,9 +83,9 @@ export default function HudSummaryTable() {
 
       {/* 캡션 */}
       <div className="flex items-center" style={{ gap: 8 }}>
-        <span className="font-black text-white" style={{ fontSize: 14 }}>{count}</span>
-        <span className="text-slate-400 font-bold" style={{ fontSize: 13 }}>{summaryCat === 'progress' ? '개 공구' : '대'}</span>
-        <span className="font-black" style={{ fontSize: 13, color: sub.c }}>· {sub.t}</span>
+        <span className="font-black text-white" style={{ fontSize: 16 }}>{count}</span>
+        <span className="text-slate-400 font-bold" style={{ fontSize: 15 }}>{summaryCat === 'progress' ? '개 공구' : '대'}</span>
+        <span className="font-black" style={{ fontSize: 15, color: sub.c }}>· {sub.t}</span>
       </div>
 
       {/* 표 (카테고리별) */}
@@ -100,7 +100,7 @@ export default function HudSummaryTable() {
               <thead>
                 <tr>
                   <Th>공구</Th>
-                  <Th w="120px">공정</Th>
+                  <Th w="140px">공정</Th>
                   <Th w="150px">진행률</Th>
                 </tr>
               </thead>
@@ -117,7 +117,7 @@ export default function HudSummaryTable() {
                           <div style={{ flex: 1, height: 7, borderRadius: 5, background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
                             <div style={{ width: `${z.progress}%`, height: '100%', background: `linear-gradient(90deg, ${color}aa, ${color})` }} />
                           </div>
-                          <span className="font-black" style={{ fontSize: 12, color, width: 34, textAlign: 'right' }}>{z.progress}%</span>
+                          <span className="font-black" style={{ fontSize: 14, color, width: 34, textAlign: 'right' }}>{z.progress}%</span>
                         </div>
                       </td>
                     </tr>
@@ -133,9 +133,9 @@ export default function HudSummaryTable() {
                 <tr>
                   <Th w="34px"> </Th>
                   <Th>장비</Th>
-                  <Th w="62px">종류</Th>
+                  <Th w="72px">종류</Th>
                   <Th>작업</Th>
-                  <Th w="64px" right>상태</Th>
+                  <Th w="74px" right>상태</Th>
                 </tr>
               </thead>
               <tbody>
@@ -161,9 +161,9 @@ export default function HudSummaryTable() {
                 <tr>
                   <Th w="34px"> </Th>
                   <Th>카메라</Th>
-                  <Th w="90px">유형</Th>
-                  <Th w="70px" right>스피커</Th>
-                  <Th w="64px" right>상태</Th>
+                  <Th w="100px">유형</Th>
+                  <Th w="78px" right>스피커</Th>
+                  <Th w="74px" right>상태</Th>
                 </tr>
               </thead>
               <tbody>
@@ -173,7 +173,7 @@ export default function HudSummaryTable() {
                     <tr key={c.id} style={{ borderTop: '1px solid rgba(148,163,184,0.1)', opacity: online ? 1 : 0.6 }}>
                       <Td><Dot color={online ? '#22d3ee' : '#64748b'} glow={online} /></Td>
                       <Td color="#fff">{c.name}</Td>
-                      <Td color="#94a3b8">{CCTV_TYPE_LABEL[c.type]}</Td>
+                      <Td color="#94a3b8">{cctvKindLabel(c)}{c.power === 'solar' ? ' ☀' : ''}</Td>
                       <Td right>
                         {c.hasSpeaker
                           ? <Volume2 style={{ width: 16, height: 16, color: '#38bdf8', display: 'inline' }} />

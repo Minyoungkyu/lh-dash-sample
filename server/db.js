@@ -22,6 +22,7 @@ const rowToZone = (r) => ({
 });
 const rowToCctv = (r) => ({
   id: r.id, name: r.name, loc: r.loc, zone: r.zone, type: r.type, status: r.status,
+  mount: r.mount ?? 'fixed', power: r.power ?? 'ac',
   hasSpeaker: r.has_speaker, streamUrl: r.stream_url, lat: r.lat == null ? null : Number(r.lat), lng: r.lng == null ? null : Number(r.lng),
 });
 
@@ -35,6 +36,7 @@ const ZONE_COLS = [
 const CCTV_COLS = [
   ['id', (c) => c.id], ['name', (c) => c.name], ['loc', (c) => c.loc ?? null], ['zone', (c) => c.zone ?? null],
   ['type', (c) => c.type ?? 'fixed'], ['status', (c) => c.status ?? 'online'], ['has_speaker', (c) => !!c.hasSpeaker],
+  ['mount', (c) => c.mount ?? 'fixed'], ['power', (c) => c.power ?? 'ac'],
   ['stream_url', (c) => c.streamUrl ?? null], ['lat', (c) => c.lat ?? null], ['lng', (c) => c.lng ?? null],
 ];
 
@@ -59,7 +61,11 @@ export async function init() {
   await q(`CREATE TABLE IF NOT EXISTS cctvs (
     id text PRIMARY KEY, name text NOT NULL, loc text, zone text, type text, status text,
     has_speaker boolean DEFAULT false, stream_url text, lat double precision, lng double precision,
+    mount text DEFAULT 'fixed', power text DEFAULT 'ac',
     updated_at timestamptz DEFAULT now())`);
+  // 기존 DB 마이그레이션 — 유형 3축(설치방식/전원) 컬럼 추가
+  await q(`ALTER TABLE cctvs ADD COLUMN IF NOT EXISTS mount text DEFAULT 'fixed'`);
+  await q(`ALTER TABLE cctvs ADD COLUMN IF NOT EXISTS power text DEFAULT 'ac'`);
 
   const zc = await q('SELECT COUNT(*)::int AS n FROM zones');
   if (zc.rows[0].n === 0) {
@@ -117,7 +123,7 @@ export async function insertCctv(c) {
   return rowToCctv(r.rows[0]);
 }
 export async function updateCctv(id, patch) {
-  const map = { name: 'name', loc: 'loc', zone: 'zone', type: 'type', status: 'status', hasSpeaker: 'has_speaker', streamUrl: 'stream_url', lat: 'lat', lng: 'lng' };
+  const map = { name: 'name', loc: 'loc', zone: 'zone', type: 'type', status: 'status', mount: 'mount', power: 'power', hasSpeaker: 'has_speaker', streamUrl: 'stream_url', lat: 'lat', lng: 'lng' };
   const sets = [], vals = [];
   let i = 1;
   for (const [k, col] of Object.entries(map)) {

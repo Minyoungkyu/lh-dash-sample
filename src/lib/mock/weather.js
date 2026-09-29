@@ -55,25 +55,37 @@ export const WEATHER = {
 };
 
 // 실데이터 스토어 — 초기값은 목업, 로드 후 실서버 데이터로 교체.
-const useWeatherStore = create(() => ({ data: WEATHER, source: 'mock' }));
+// ready: 첫 데이터 준비 완료 여부(로딩 오버레이 게이트).
+const useWeatherStore = create(() => ({ data: WEATHER, source: 'mock', ready: false }));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+async function fetchOnce() {
+  const r = await fetch('/api/weather');
+  if (!r.ok) throw new Error('http ' + r.status);
+  const d = await r.json();
+  if (!d || !d.current) throw new Error('bad payload');
+  return d;
+}
+
+// 폴링(60초) — 성공 시 갱신, 실패 시 마지막값 유지
 async function refreshWeather() {
-  try {
-    const r = await fetch('/api/weather');
-    if (!r.ok) return;
-    const d = await r.json();
-    if (d && d.current) useWeatherStore.setState({ data: d, source: d.source || 'live' });
-  } catch {
-    /* 네트워크/서버 오류 시 마지막 데이터(초기엔 목업) 유지 */
+  try { useWeatherStore.setState({ data: await fetchOnce(), source: 'live' }); } catch { /* keep last */ }
+}
+
+// 초기/재기동 — 폴링 주기와 무관하게 즉시 조회, 준비될 때까지 재시도 후 ready
+async function initWeather() {
+  for (let i = 0; i < 12; i++) {
+    try { useWeatherStore.setState({ data: await fetchOnce(), source: 'live', ready: true }); return; }
+    catch { await sleep(1500); }
   }
+  useWeatherStore.setState({ ready: true }); // 그래도 응답 없으면 목업으로 진행
 }
 
 if (typeof window !== 'undefined') {
-  refreshWeather();
-  setInterval(refreshWeather, 60000); // 60초 폴링
+  initWeather();
+  setInterval(refreshWeather, 60000);
 }
 
-export function useWeather() {
-  return useWeatherStore((s) => s.data);
-}
+export function useWeather() { return useWeatherStore((s) => s.data); }
+export function useWeatherReady() { return useWeatherStore((s) => s.ready); }
 

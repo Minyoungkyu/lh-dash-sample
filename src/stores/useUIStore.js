@@ -51,12 +51,18 @@ export const useUIStore = create((set, get) => ({
   editMode: false,
   editTool: null, // null | 'draw-zone' | 'place-cctv'
   // 진입 시 드로어·팝업 등 일반 상호작용을 닫고 잠근다. 해제 시 도구 초기화.
-  toggleEditMode: () => set((s) => (s.editMode ? { editMode: false, editTool: null, draftZone: null, cctvForm: null, zoneEdit: null } : { ...BASE_RESET, editMode: true, editTool: null, draftZone: null, cctvForm: null, zoneEdit: null })),
+  toggleEditMode: () => set((s) => {
+    const reset = { editTool: null, draftZone: null, cctvForm: null, zoneEdit: null, zoneNaming: false, placeCctvZone: null, confirmDialog: null };
+    return s.editMode ? { editMode: false, ...reset } : { ...BASE_RESET, editMode: true, ...reset };
+  }),
   setEditTool: (t) => set((s) => ({ editTool: s.editTool === t ? null : t, zoneEdit: null })),
 
-  // ── 편집: 구역 그리기 드래프트 ─────────────────────────
+  // ── 편집: 구역 추가(이름입력 → 그리기) ─────────────────────
+  zoneNaming: false, // 이름/색 입력 단계
+  startZoneAdd: () => set({ zoneNaming: true, zoneEdit: null, editTool: null }),
+  cancelZoneAdd: () => set({ zoneNaming: false }),
   draftZone: null, // { name, color, points: [[lat,lng]...] }
-  startDrawZone: (name, color) => set({ draftZone: { name: name || '새 구역', color: color || '#38bdf8', points: [] }, editTool: 'draw-zone', zoneEdit: null }),
+  startDrawZone: (name, color) => set({ draftZone: { name: name || '새 구역', color: color || '#38bdf8', points: [] }, editTool: 'draw-zone', zoneNaming: false, zoneEdit: null }),
   addDraftPoint: (lat, lng) => set((s) => (s.draftZone ? { draftZone: { ...s.draftZone, points: [...s.draftZone.points, [lat, lng]] } } : {})),
   undoDraftPoint: () => set((s) => (s.draftZone ? { draftZone: { ...s.draftZone, points: s.draftZone.points.slice(0, -1) } } : {})),
   cancelDraftZone: () => set({ draftZone: null, editTool: null }),
@@ -72,7 +78,7 @@ export const useUIStore = create((set, get) => ({
 
   // ── 편집: CCTV 배치/수정 폼 ─────────────────────────
   cctvForm: null, // { mode:'create'|'edit', id?, lat, lng, name, loc, zone, type, status, hasSpeaker, streamUrl }
-  openCctvForm: (form) => set({ cctvForm: form, editTool: null }),
+  openCctvForm: (form) => set({ cctvForm: form, editTool: null, placeCctvZone: null }),
   updateCctvForm: (patch) => set((s) => ({ cctvForm: s.cctvForm ? { ...s.cctvForm, ...patch } : null })),
   closeCctvForm: () => set({ cctvForm: null }),
   saveCctvForm: () => {
@@ -80,6 +86,7 @@ export const useUIStore = create((set, get) => ({
     if (!f) return;
     const data = {
       name: f.name || 'CCTV', loc: f.loc || '', zone: f.zone || '', type: f.type || 'fixed',
+      mount: f.mount || 'fixed', power: f.power || 'ac',
       status: f.status || 'online', hasSpeaker: !!f.hasSpeaker, streamUrl: f.streamUrl || '', lat: f.lat, lng: f.lng,
     };
     const site = useSiteStore.getState();
@@ -93,6 +100,19 @@ export const useUIStore = create((set, get) => ({
   zoneEdit: null, // { id }
   selectZoneEdit: (id) => set({ zoneEdit: { id } }),
   closeZoneEdit: () => set({ zoneEdit: null }),
+
+  // 구역 프레이밍(과확대 없이 폴리곤에 맞춤) — MapLayer 가 nonce 변화에 fitBounds
+  zoneFit: null, // { id, nonce }
+  fitZone: (id) => set((s) => ({ zoneFit: { id, nonce: (s.zoneFit?.nonce || 0) + 1 } })),
+
+  // CCTV 배치 대상 구역(구역 편집에서 진입 시 자동 지정)
+  placeCctvZone: null,
+  startPlaceCctv: (zoneId) => set({ editTool: 'place-cctv', placeCctvZone: zoneId ?? null }),
+
+  // 인앱 확인 모달 (삭제 등) — { message, confirmLabel?, onConfirm }
+  confirmDialog: null,
+  askConfirm: (opts) => set({ confirmDialog: opts }),
+  closeConfirm: () => set({ confirmDialog: null }),
 
   // 지도 구역 스위처 (null = 전체)
   activeZone: null, // null | 'A공구' | ...
@@ -145,8 +165,12 @@ export const useUIStore = create((set, get) => ({
   openEquip: (eq) => set({ selectedEquip: eq }),
   closeEquip: () => set({ selectedEquip: null }),
 
-  // 목록(드로어)에서 항목 클릭 → 지도를 해당 핀으로 이동 (camFocus 재사용)
-  flyToPin: (lng, lat) => set({ camFocus: { lng, lat, nonce: ++focusSeq } }),
+  // 목록(드로어)에서 항목 클릭 → 지도를 해당 핀으로 이동 (camFocus 재사용). zoom 생략 시 기본값.
+  flyToPin: (lng, lat, zoom) => set({ camFocus: { lng, lat, zoom, nonce: ++focusSeq } }),
+
+  // 주소검색 결과 표시용 임시 마커 — { lng, lat, label } | null
+  searchPin: null,
+  setSearchPin: (p) => set({ searchPin: p }),
 
   // SOS·전체방송도 비상 트리거처럼 기본 상태로 리셋 후 발생
   openSos: (worker) => set({ ...BASE_RESET, sosWorker: worker }),

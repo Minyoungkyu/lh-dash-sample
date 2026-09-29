@@ -25,15 +25,15 @@ export default function HudEvents() {
   return (
     <div
       className="absolute panel flex flex-col z-[500]"
-      style={{ left: 24, top: 88, bottom: 24, width: 460, padding: 20, borderRadius: 18, pointerEvents: 'auto', gap: 14 }}
+      style={{ left: 24, top: 88, bottom: 24, width: 500, padding: 20, borderRadius: 18, pointerEvents: 'auto', gap: 14 }}
     >
       {/* 헤더 */}
       <div className="flex items-center" style={{ gap: 10 }}>
         <Radio style={{ width: 24, height: 24, color: '#38bdf8' }} />
-        <span className="font-black text-cyan-300" style={{ fontSize: 21 }}>현장 현황</span>
+        <span className="font-black text-cyan-300" style={{ fontSize: 24 }}>현장 현황</span>
         <span
           className="ml-auto font-black"
-          style={{ fontSize: 14, color: activeZone ? '#38bdf8' : '#94a3b8', background: activeZone ? 'rgba(56,189,248,0.14)' : 'rgba(148,163,184,0.12)', border: `1px solid ${activeZone ? 'rgba(56,189,248,0.4)' : 'rgba(148,163,184,0.25)'}`, padding: '4px 12px', borderRadius: 999 }}
+          style={{ fontSize: 16, color: activeZone ? '#38bdf8' : '#94a3b8', background: activeZone ? 'rgba(56,189,248,0.14)' : 'rgba(148,163,184,0.12)', border: `1px solid ${activeZone ? 'rgba(56,189,248,0.4)' : 'rgba(148,163,184,0.25)'}`, padding: '4px 12px', borderRadius: 999 }}
         >
           {activeZone ?? '전체 현장'}
         </span>
@@ -50,9 +50,9 @@ export default function HudEvents() {
       {/* 하단: 실시간 이벤트 히스토리 */}
       <div className="flex flex-col min-h-0" style={{ flex: 1, gap: 10 }}>
         <div className="flex items-center" style={{ gap: 8 }}>
-          <span className="font-black text-slate-200" style={{ fontSize: 15, letterSpacing: '0.02em' }}>이벤트 현황</span>
-          {dangerCount > 0 && <span className="font-black text-rose-400" style={{ fontSize: 13 }}>위험 {dangerCount}건</span>}
-          <span className="ml-auto flex items-center text-emerald-400 font-bold" style={{ gap: 6, fontSize: 12 }}>
+          <span className="font-black text-slate-200" style={{ fontSize: 17, letterSpacing: '0.02em' }}>이벤트 현황</span>
+          {dangerCount > 0 && <span className="font-black text-rose-400" style={{ fontSize: 15 }}>위험 {dangerCount}건</span>}
+          <span className="ml-auto flex items-center text-emerald-400 font-bold" style={{ gap: 6, fontSize: 14 }}>
             <span className="live-blink" style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e' }} /> LIVE · {list.length}건
           </span>
         </div>
@@ -61,7 +61,7 @@ export default function HudEvents() {
           style={{ gap: 7, padding: 10, borderRadius: 12, background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(148,163,184,0.1)' }}
         >
           {list.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-slate-500 font-bold" style={{ fontSize: 15 }}>
+            <div className="flex items-center justify-center h-full text-slate-500 font-bold" style={{ fontSize: 17 }}>
               해당 공구의 이벤트가 없습니다.
             </div>
           ) : (
@@ -75,10 +75,10 @@ export default function HudEvents() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center" style={{ gap: 8 }}>
-                      <span className="font-mono font-bold text-slate-400" style={{ fontSize: 13 }}>{e.time}</span>
-                      <span className="font-black" style={{ fontSize: 11, color: lv.color, background: `${lv.color}22`, padding: '2px 7px', borderRadius: 6 }}>{e.zone}</span>
+                      <span className="font-mono font-bold text-slate-400" style={{ fontSize: 15 }}>{e.time}</span>
+                      <span className="font-black" style={{ fontSize: 13, color: lv.color, background: `${lv.color}22`, padding: '2px 7px', borderRadius: 6 }}>{e.zone}</span>
                     </div>
-                    <div className="text-white font-bold" style={{ fontSize: 15, marginTop: 3, lineHeight: 1.35 }}>{e.message}</div>
+                    <div className="text-white font-bold" style={{ fontSize: 17, marginTop: 3, lineHeight: 1.35 }}>{e.message}</div>
                   </div>
                 </div>
               );

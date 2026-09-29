@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "이수건설 통합관제 대시보드 — 클라이언트(isu) 버전",
+  "description": "SM삼환기업 통합관제 대시보드 — 클라이언트(SM삼환) 버전",
   "scripts": {
     "dev": "vite",
     "server": "node server/index.js",

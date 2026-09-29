@@ -37,15 +37,15 @@ export default function HudSmartBand() {
   return (
     <div
       className="absolute panel flex flex-col z-[500]"
-      style={{ right: 24, top: 88, bottom: 24, width: 480, padding: 20, borderRadius: 18, pointerEvents: 'auto', gap: 16 }}
+      style={{ right: 24, top: 88, bottom: 24, width: 500, padding: 20, borderRadius: 18, pointerEvents: 'auto', gap: 16 }}
     >
       {/* 헤더 */}
       <div className="flex items-center" style={{ gap: 10 }}>
         <Watch style={{ width: 24, height: 24, color: '#38bdf8' }} />
-        <span className="font-black text-cyan-300" style={{ fontSize: 21 }}>스마트밴드 현황</span>
+        <span className="font-black text-cyan-300" style={{ fontSize: 24 }}>스마트밴드 현황</span>
         <span
           className="font-black"
-          style={{ fontSize: 14, color: activeZone ? '#38bdf8' : '#94a3b8', background: activeZone ? 'rgba(56,189,248,0.14)' : 'rgba(148,163,184,0.12)', border: `1px solid ${activeZone ? 'rgba(56,189,248,0.4)' : 'rgba(148,163,184,0.25)'}`, padding: '4px 12px', borderRadius: 999 }}
+          style={{ fontSize: 16, color: activeZone ? '#38bdf8' : '#94a3b8', background: activeZone ? 'rgba(56,189,248,0.14)' : 'rgba(148,163,184,0.12)', border: `1px solid ${activeZone ? 'rgba(56,189,248,0.4)' : 'rgba(148,163,184,0.25)'}`, padding: '4px 12px', borderRadius: 999 }}
         >
           {activeZone ?? '전체 현장'}
         </span>
@@ -63,8 +63,8 @@ export default function HudSmartBand() {
       <div className="grid grid-cols-6" style={{ gap: 8 }}>
         {summary.map((s) => (
           <div key={s.key} className="flex flex-col items-center justify-center" style={{ padding: '11px 2px', borderRadius: 11, background: 'rgba(0,0,0,0.3)', border: `1px solid ${s.color}44` }}>
-            <span className="font-black" style={{ fontSize: 27, color: s.color, lineHeight: 1 }}>{s.value}</span>
-            <span className="text-slate-400 font-bold" style={{ fontSize: 12, marginTop: 5 }}>{s.label}</span>
+            <span className="font-black" style={{ fontSize: 30, color: s.color, lineHeight: 1 }}>{s.value}</span>
+            <span className="text-slate-400 font-bold" style={{ fontSize: 14, marginTop: 5 }}>{s.label}</span>
           </div>
         ))}
       </div>
@@ -72,15 +72,15 @@ export default function HudSmartBand() {
       {/* 근로자 롤링 (flex-1) */}
       <div className="flex flex-col min-h-0" style={{ flex: 1, gap: 10 }}>
         <div className="flex items-center" style={{ gap: 8 }}>
-          <span className="font-black text-slate-300" style={{ fontSize: 15, letterSpacing: '0.03em' }}>근로자 현황</span>
-          <span className="ml-auto text-rose-400 font-bold" style={{ fontSize: 12 }}>SpO₂ &lt;90% · 온도 ≥37.5℃ 위험</span>
+          <span className="font-black text-slate-300" style={{ fontSize: 17, letterSpacing: '0.03em' }}>근로자 현황</span>
+          <span className="ml-auto text-rose-400 font-bold" style={{ fontSize: 14 }}>SpO₂ &lt;90% · 온도 ≥37.5℃ 위험</span>
         </div>
         <div
           className="flex-1 min-h-0 overflow-y-auto thin-scroll flex flex-col"
           style={{ gap: 8, padding: 10, borderRadius: 12, background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(148,163,184,0.1)' }}
         >
           {sorted.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-slate-500 font-bold" style={{ fontSize: 15 }}>
+            <div className="flex items-center justify-center h-full text-slate-500 font-bold" style={{ fontSize: 17 }}>
               해당 공구의 근로자가 없습니다.
             </div>
           ) : (
@@ -104,18 +104,18 @@ export default function HudSmartBand() {
                       }}
                     >
                       <span className={isSos ? 'live-blink' : ''} style={{ width: 12, height: 12, borderRadius: '50%', background: s.color, boxShadow: w.online ? `0 0 8px ${s.color}` : 'none', flex: '0 0 auto' }} />
-                      <div className="flex flex-col" style={{ minWidth: 0, width: 160 }}>
-                        <span className="font-black text-white truncate" style={{ fontSize: 16 }}>{w.name}</span>
-                        <span className="text-slate-500 font-bold truncate" style={{ fontSize: 12 }}>{w.company} · {w.team}</span>
+                      <div className="flex flex-col" style={{ minWidth: 0, width: 180 }}>
+                        <span className="font-black text-white truncate" style={{ fontSize: 18 }}>{w.name}</span>
+                        <span className="text-slate-500 font-bold truncate" style={{ fontSize: 14 }}>{w.company} · {w.team}</span>
                       </div>
                       <div className="flex items-center ml-auto" style={{ gap: 14 }}>
                         <span className="flex items-center" style={{ gap: 6 }}>
                           <Droplet style={{ width: 15, height: 15, color: spo2Color }} />
-                          <span className="font-black" style={{ fontSize: 16, color: spo2Color }}>{w.spo2 != null ? `${w.spo2}%` : '---'}</span>
+                          <span className="font-black" style={{ fontSize: 18, color: spo2Color }}>{w.spo2 != null ? `${w.spo2}%` : '---'}</span>
                         </span>
                         <span className="flex items-center" style={{ gap: 6 }}>
                           <Thermometer style={{ width: 15, height: 15, color: tempColor }} />
-                          <span className="font-black" style={{ fontSize: 16, color: tempColor }}>{w.skinTemp != null ? `${w.skinTemp}℃` : '---'}</span>
+                          <span className="font-black" style={{ fontSize: 18, color: tempColor }}>{w.skinTemp != null ? `${w.skinTemp}℃` : '---'}</span>
                         </span>
                         {!w.online && <WifiOff style={{ width: 15, height: 15, color: '#64748b' }} />}
                       </div>

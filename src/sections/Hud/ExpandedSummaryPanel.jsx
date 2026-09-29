@@ -1,6 +1,6 @@
 import { Wrench, Video, Volume2, VolumeX } from 'lucide-react';
 import { EQUIP_LIST, EQUIP_STATUS, EQUIP_KIND_LABEL, COMM_STATUS } from '@/lib/mock/equipment';
-import { CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
+import { cctvKindLabel } from '@/lib/mock/cctv';
 import { useUIStore } from '@/stores/useUIStore';
 import { useSiteStore } from '@/stores/useSiteStore';
 import ZoneSummaryPanel from '@/sections/ZoneSummaryPanel';
@@ -138,7 +138,7 @@ export default function ExpandedSummaryPanel() {
                       <Td><Dot color={online ? '#22d3ee' : '#64748b'} glow={online} /></Td>
                       <Td color="#fff">{c.name}</Td>
                       <Td color="#94a3b8">{c.id}</Td>
-                      <Td color="#cbd5e1">{CCTV_TYPE_LABEL[c.type]}</Td>
+                      <Td color="#cbd5e1">{cctvKindLabel(c)}{c.power === 'solar' ? ' ☀' : ''}</Td>
                       <Td color="#94a3b8">{c.zone}</Td>
                       <Td color="#cbd5e1">{c.loc}</Td>
                       <Td>

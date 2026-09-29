@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Video, Rotate3d, Camera, Volume2, VolumeX, Trash2, Check, X, Play } from 'lucide-react';
+import { Video, Rotate3d, Camera, Volume2, VolumeX, Trash2, Check, X, Play, Truck, Plug, Sun } from 'lucide-react';
 import { useUIStore } from '@/stores/useUIStore';
 import { useSiteStore } from '@/stores/useSiteStore';
 import HlsVideo from '@/components/HlsVideo';
@@ -37,6 +37,7 @@ export default function CctvEditModal() {
   const save = useUIStore((s) => s.saveCctvForm);
   const close = useUIStore((s) => s.closeCctvForm);
   const del = useUIStore((s) => s.deleteCctv);
+  const askConfirm = useUIStore((s) => s.askConfirm);
   const zones = useSiteStore((s) => s.zones);
   const [preview, setPreview] = useState('');
 
@@ -93,12 +94,22 @@ export default function CctvEditModal() {
           <Field label="상태">
             <Toggle value={form.status} onChange={(v) => update({ status: v })} options={[{ value: 'online', label: '가동중' }, { value: 'offline', label: '오프라인' }]} />
           </Field>
-          <Field label="유형">
-            <Toggle value={form.type} onChange={(v) => update({ type: v })} options={[{ value: 'rotating', label: '이동형', icon: Rotate3d }, { value: 'fixed', label: '고정형', icon: Camera }]} />
+          <Field label="설치방식">
+            <Toggle value={form.mount || 'fixed'} onChange={(v) => update({ mount: v })} options={[{ value: 'fixed', label: '고정형', icon: Camera }, { value: 'mobile', label: '이동형', icon: Truck }]} />
           </Field>
           <Field label="스피커">
             <Toggle value={form.hasSpeaker} onChange={(v) => update({ hasSpeaker: v })} options={[{ value: true, label: '있음', icon: Volume2 }, { value: false, label: '없음', icon: VolumeX }]} />
           </Field>
+          {(form.mount || 'fixed') === 'fixed' && (
+            <>
+              <Field label="카메라 종류">
+                <Toggle value={form.type} onChange={(v) => update({ type: v })} options={[{ value: 'fixed', label: '고정형', icon: Camera }, { value: 'rotating', label: '회전형', icon: Rotate3d }]} />
+              </Field>
+              <Field label="전원">
+                <Toggle value={form.power || 'ac'} onChange={(v) => update({ power: v })} options={[{ value: 'ac', label: '상시전원', icon: Plug }, { value: 'solar', label: '태양광', icon: Sun }]} />
+              </Field>
+            </>
+          )}
         </div>
         <Field label="영상 주소 (HLS .m3u8)">
           <input value={form.streamUrl} onChange={(e) => update({ streamUrl: e.target.value })} placeholder="https://.../live/stream.m3u8" style={inputStyle} />
@@ -107,7 +118,7 @@ export default function CctvEditModal() {
         {/* 액션 */}
         <div className="flex items-center" style={{ gap: 10, marginTop: 4 }}>
           {isEdit && (
-            <button onClick={() => del(form.id)} className="flex items-center font-black text-white transition-all hover:brightness-110" style={{ gap: 7, padding: '12px 18px', borderRadius: 11, fontSize: 15, background: 'rgba(255,59,92,0.85)', cursor: 'pointer' }}>
+            <button onClick={() => askConfirm({ message: `'${form.name || 'CCTV'}' 를 삭제할까요?`, confirmLabel: 'CCTV 삭제', onConfirm: () => del(form.id) })} className="flex items-center font-black text-white transition-all hover:brightness-110" style={{ gap: 7, padding: '12px 18px', borderRadius: 11, fontSize: 15, background: 'rgba(255,59,92,0.85)', cursor: 'pointer' }}>
               <Trash2 style={{ width: 17, height: 17 }} /> 삭제
             </button>
           )}

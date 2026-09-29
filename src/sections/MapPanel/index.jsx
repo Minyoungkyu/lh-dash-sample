@@ -1,6 +1,7 @@
 import { SITE } from '@/lib/mock/site';
 import { useUIStore } from '@/stores/useUIStore';
 import ZoneSwitcher from './ZoneSwitcher';
+import AddressSearch from './AddressSearch';
 import HudEvents from '@/sections/Hud/HudEvents';
 import HudSmartBand from '@/sections/Hud/HudSmartBand';
 import HudWeather from '@/sections/Hud/HudWeather';
@@ -26,12 +27,15 @@ export default function MapPanel() {
       {/* 타이틀 (편집모드에선 숨김 — 툴바가 그 자리) */}
       {!editMode && (
         <div className="absolute z-[500] flex items-center" style={{ top: 20, left: 24, gap: 12, pointerEvents: 'auto' }}>
-          <div className="flex items-center panel" style={{ gap: 12, padding: '12px 20px', borderRadius: 14 }}>
-            <span className="font-black text-cyan-300" style={{ fontSize: 22, letterSpacing: '0.02em' }}>현장 관제 지도</span>
-            <span className="text-slate-400 font-bold" style={{ fontSize: 15 }}>{SITE.name}</span>
+          <div className="flex items-center panel" style={{ gap: 12, padding: '12px 20px', borderRadius: 14, width: 500 }}>
+            <span className="font-black text-cyan-300" style={{ fontSize: 24, letterSpacing: '0.02em' }}>현장 관제 지도</span>
+            <span className="text-slate-400 font-bold" style={{ fontSize: 17 }}>{SITE.name}</span>
           </div>
         </div>
       )}
+
+      {/* 주소 검색 → 지도 포커스 (편집/일반 공통) */}
+      <AddressSearch />
 
       {/* 편집 컨트롤 (토글/툴바) + 공구 목록 + 구역 편집 패널 */}
       <EditControls />

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ShieldCheck, Radio, Siren, UserX, Flame, HardHat, ShieldAlert } from 'lucide-react';
 import { SITE } from '@/lib/mock/site';
 import { SOS_DEMO_WORKER } from '@/lib/mock/smartband';
 import { EMERGENCIES, EMERGENCY_ORDER } from '@/lib/mock/emergency';
+import { SHOW_SIM_CONTROLS, SHOW_BROADCAST } from '@/lib/uiConfig';
 import { useUIStore } from '@/stores/useUIStore';
 
 // 비상상황 아이콘 매핑
@@ -64,14 +65,32 @@ function Clock() {
 export default function Header() {
   const openBroadcast = useUIStore((s) => s.openBroadcast);
   const openSos = useUIStore((s) => s.openSos);
+  const editMode = useUIStore((s) => s.editMode);
+  const toggleEditMode = useUIStore((s) => s.toggleEditMode);
+
+  // 로고 5연타(1.2초 내 연속) → 편집 모드 진입 (숨은 진입점)
+  const tapRef = useRef({ n: 0, timer: null });
+  const handleLogoTap = () => {
+    if (editMode) return;
+    const t = tapRef.current;
+    if (t.timer) clearTimeout(t.timer);
+    t.n += 1;
+    if (t.n >= 5) {
+      t.n = 0;
+      toggleEditMode();
+      return;
+    }
+    t.timer = setTimeout(() => { t.n = 0; }, 1200);
+  };
 
   return (
     <div className="flex items-center h-full panel" style={{ padding: '0 36px', gap: 28, borderRadius: 20 }}>
       {/* 로고 / 현장명 */}
       <div className="flex items-center" style={{ gap: 18 }}>
         <div
-          className="flex items-center justify-center"
-          style={{ width: 60, height: 60, borderRadius: 16, background: 'linear-gradient(160deg,#0ea5e9,#0369a1)', boxShadow: '0 0 24px rgba(14,165,233,0.5)' }}
+          onClick={handleLogoTap}
+          className="flex items-center justify-center select-none"
+          style={{ width: 60, height: 60, borderRadius: 16, background: 'linear-gradient(160deg,#0ea5e9,#0369a1)', boxShadow: '0 0 24px rgba(14,165,233,0.5)', cursor: 'pointer' }}
         >
           <ShieldCheck style={{ width: 34, height: 34, color: '#fff' }} />
         </div>
@@ -87,39 +106,44 @@ export default function Header() {
 
       {/* 액션 */}
       <div className="ml-auto flex items-center" style={{ gap: 16 }}>
-        {/* CCTV 자동감지 비상 시연 그룹 */}
-        <div className="flex flex-col" style={{ gap: 6 }}>
-          <span className="text-slate-500 font-bold" style={{ fontSize: 12, letterSpacing: '0.05em', paddingLeft: 2 }}>
-            CCTV 자동감지 시연
-          </span>
-          <div className="flex items-center" style={{ gap: 8 }}>
-            {EMERGENCY_ORDER.map((type) => (
-              <EmergencyButton key={type} type={type} />
-            ))}
-          </div>
-        </div>
+        {/* 상황발생 시연 (CCTV 자동감지 4종 + SOS) — 실운영 숨김 */}
+        {SHOW_SIM_CONTROLS && (
+          <>
+            <div className="flex flex-col" style={{ gap: 6 }}>
+              <span className="text-slate-500 font-bold" style={{ fontSize: 12, letterSpacing: '0.05em', paddingLeft: 2 }}>
+                CCTV 자동감지 시연
+              </span>
+              <div className="flex items-center" style={{ gap: 8 }}>
+                {EMERGENCY_ORDER.map((type) => (
+                  <EmergencyButton key={type} type={type} />
+                ))}
+              </div>
+            </div>
+            <div style={{ width: 1, height: 52, background: 'rgba(148,163,184,0.25)' }} />
+            <button
+              onClick={() => openSos(SOS_DEMO_WORKER)}
+              title="스마트밴드 시연: SOS 경보 팝업 띄우기"
+              className="flex items-center font-black text-white transition-all hover:brightness-110"
+              style={{ gap: 10, padding: '14px 20px', borderRadius: 14, fontSize: 18, background: 'linear-gradient(180deg,#ff3b5c,#e11d48)', boxShadow: '0 6px 20px rgba(255,59,92,0.4)' }}
+            >
+              <Siren style={{ width: 22, height: 22 }} />
+              SOS 발생
+            </button>
+          </>
+        )}
 
-        <div style={{ width: 1, height: 52, background: 'rgba(148,163,184,0.25)' }} />
+        {SHOW_BROADCAST && (
+          <button
+            onClick={openBroadcast}
+            className="flex items-center font-black text-white transition-all hover:brightness-110"
+            style={{ gap: 11, padding: '15px 24px', borderRadius: 14, fontSize: 22, background: 'linear-gradient(180deg,#f59e0b,#d97706)', boxShadow: '0 6px 20px rgba(245,158,11,0.4)' }}
+          >
+            <Radio style={{ width: 26, height: 26 }} />
+            전체 일괄방송
+          </button>
+        )}
 
-        <button
-          onClick={() => openSos(SOS_DEMO_WORKER)}
-          title="스마트밴드 시연: SOS 경보 팝업 띄우기"
-          className="flex items-center font-black text-white transition-all hover:brightness-110"
-          style={{ gap: 10, padding: '14px 20px', borderRadius: 14, fontSize: 18, background: 'linear-gradient(180deg,#ff3b5c,#e11d48)', boxShadow: '0 6px 20px rgba(255,59,92,0.4)' }}
-        >
-          <Siren style={{ width: 22, height: 22 }} />
-          SOS 발생
-        </button>
-        <button
-          onClick={openBroadcast}
-          className="flex items-center font-black text-white transition-all hover:brightness-110"
-          style={{ gap: 10, padding: '14px 20px', borderRadius: 14, fontSize: 18, background: 'linear-gradient(180deg,#f59e0b,#d97706)', boxShadow: '0 6px 20px rgba(245,158,11,0.4)' }}
-        >
-          <Radio style={{ width: 22, height: 22 }} />
-          전체 일괄방송
-        </button>
-
-        <div style={{ width: 1, height: 52, background: 'rgba(148,163,184,0.25)' }} />
+        {SHOW_BROADCAST && <div style={{ width: 1, height: 52, background: 'rgba(148,163,184,0.25)' }} />}
         <Clock />
       </div>
     </div>

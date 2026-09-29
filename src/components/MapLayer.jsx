@@ -18,6 +18,20 @@ function boundsOf(points) {
   return [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]];
 }
 
+// 전체(오버뷰) 프레이밍 패딩 — 좌(공구목록 460)/우(스마트밴드 480)/하(날씨바 168) HUD 패널에
+// 가리지 않도록 지도폭·높이 비율로 여백 확보(스케일 무관, 화면px로 환산됨).
+function overviewPadding(map) {
+  const c = map.getContainer();
+  const w = c.clientWidth || 1200;
+  const h = c.clientHeight || 800;
+  return {
+    left: Math.round(w * 0.15),
+    right: Math.round(w * 0.16),
+    top: Math.round(h * 0.08),
+    bottom: Math.round(h * 0.13),
+  };
+}
+
 function zoneGeoJSON(zones, activeZone) {
   return {
     type: 'FeatureCollection',
@@ -56,6 +70,12 @@ function destPoint(lng, lat, bearingDeg, distM) {
   return [lng + dLng, lat + dLat];
 }
 function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
+// avalanche 믹스 — 인접한 입력(CAM-42 vs CAM-43)도 전 비트가 크게 달라지도록 확산
+function mix32(x) {
+  x = Math.imul(x ^ (x >>> 16), 0x45d9f3b) >>> 0;
+  x = Math.imul(x ^ (x >>> 16), 0x45d9f3b) >>> 0;
+  return (x ^ (x >>> 16)) >>> 0;
+}
 function sectorFeature(cam, heading, fov, radius, band, sel) {
   const steps = 22;
   const start = heading - fov / 2;
@@ -66,14 +86,23 @@ function sectorFeature(cam, heading, fov, radius, band, sel) {
 }
 // 겹쳐 그려 apex(밝음)→가장자리(옅음) 그라디언트 빔 느낌을 내는 반경 배율
 const FOV_BANDS = [1.0, 0.72, 0.46];
-const ROT_DPS = 15; // 회전 속도(도/초) — 약 24초에 한 바퀴
+const ROT_DPS = 15; // 기준 회전 속도(도/초) — 약 24초에 한 바퀴
+// 핀마다 시작각·속도·방향을 다르게 → 여러 화각이 같은 위상으로 겹쳐 보이는 문제 방지
+function camRot(id) {
+  const h = mix32(hashStr(id));                      // 강하게 섞어 인접 ID도 완전히 다르게
+  const startDeg = h % 360;                          // 시작각 0~359°
+  const speed = ROT_DPS * (0.5 + ((h >>> 9) % 100) / 100); // 속도 약 0.5~1.49배
+  const dir = ((h >>> 20) & 1) ? 1 : -1;            // 절반은 반시계 방향
+  return { startDeg, speed, dir };
+}
 function fovGeoJSON(cctvs, phase, selId) {
   const feats = [];
   for (const cam of cctvs) {
-    if (cam.type !== 'rotating') continue; // 고정형은 화각 없음(핀만)
+    if ((cam.mount ?? 'fixed') === 'mobile' || cam.type !== 'rotating') continue; // 회전형 카메라만 화각(이동형·고정형카메라는 핀만)
     if (cam.lng == null || cam.lat == null) continue;
     const fov = 64;
-    const heading = (phase * ROT_DPS + (hashStr(cam.id) % 360)) % 360; // 360° 회전
+    const { startDeg, speed, dir } = camRot(cam.id);
+    const heading = (((startDeg + dir * phase * speed) % 360) + 360) % 360; // 핀별 독립 회전
     const baseR = cam.status === 'online' ? 140 : 100;
     const sel = selId === cam.id;
     FOV_BANDS.forEach((f, i) => feats.push(sectorFeature(cam, heading, fov, baseR * f, i, sel)));
@@ -98,6 +127,7 @@ export default function MapLayer() {
   const fovRafRef = useRef(null);
   const zoneMarkersRef = useRef([]);
   const cctvMarkersRef = useRef([]);
+  const searchMarkerRef = useRef(null);
   const didFitRef = useRef(false);
   const [ready, setReady] = useState(false);
 
@@ -107,9 +137,12 @@ export default function MapLayer() {
   const zoneNonce = useUIStore((s) => s.zoneNonce);
   const basemap = useUIStore((s) => s.basemap);
   const camFocus = useUIStore((s) => s.camFocus);
+  const searchPin = useUIStore((s) => s.searchPin);
   const editMode = useUIStore((s) => s.editMode);
   const editTool = useUIStore((s) => s.editTool);
   const draftZone = useUIStore((s) => s.draftZone);
+  const zoneNaming = useUIStore((s) => s.zoneNaming);
+  const zoneFit = useUIStore((s) => s.zoneFit);
 
   // 지도 생성 (1회)
   useEffect(() => {
@@ -221,7 +254,7 @@ export default function MapLayer() {
 
       setReady(true);
       const pts0 = zs.flatMap((z) => z.polygon || []);
-      if (pts0.length) map.fitBounds(boundsOf(pts0), { padding: 100, duration: 0 });
+      if (pts0.length) map.fitBounds(boundsOf(pts0), { padding: overviewPadding(map), duration: 0 });
     });
 
     // 초기 렌더 킥
@@ -279,7 +312,7 @@ export default function MapLayer() {
     // 최초 구역 로드 시 1회 전체 프레이밍 (비동기 로드로 지도 생성 시점엔 비어있을 수 있음)
     if (!didFitRef.current && !activeZone) {
       const pts = zones.flatMap((z) => z.polygon || []);
-      if (pts.length) { map.fitBounds(boundsOf(pts), { padding: 100, duration: 0 }); didFitRef.current = true; }
+      if (pts.length) { map.fitBounds(boundsOf(pts), { padding: overviewPadding(map), duration: 0 }); didFitRef.current = true; }
     }
   }, [zones, activeZone, ready]);
 
@@ -306,16 +339,52 @@ export default function MapLayer() {
     if (!map || !ready) return;
     cctvMarkersRef.current.forEach((m) => m.remove());
     cctvMarkersRef.current = [];
+    const HOLD_MS = 450; // 이 시간 이상 누르고 있으면 '이동 모드'
     cctvs.forEach((cam) => {
       if (cam.lng == null || cam.lat == null) return;
       const el = cctvEl(cam);
       el.addEventListener('mousedown', (e) => e.stopPropagation());
-      const mk = new maplibregl.Marker({ element: el, anchor: 'center', offset: [0, 6], draggable: editMode }).setLngLat([cam.lng, cam.lat]).addTo(map);
+      el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+      const mk = new maplibregl.Marker({ element: el, anchor: 'center', offset: [0, 6] }).setLngLat([cam.lng, cam.lat]).addTo(map);
+
       if (editMode) {
-        mk.on('dragend', () => { const p = mk.getLngLat(); useSiteStore.getState().moveCctv(cam.id, p.lng, p.lat); });
+        // 길게 누르면(HOLD_MS) 이동 모드 → 드래그로 위치 이동, 짧게 누르면 편집창
+        el.style.touchAction = 'none';
+        let holdTimer = null, dragging = false, suppressClick = false;
+        const onPointerMove = (ev) => {
+          const rect = map.getContainer().getBoundingClientRect();
+          mk.setLngLat(map.unproject([ev.clientX - rect.left, ev.clientY - rect.top]));
+        };
+        const onPointerUp = () => {
+          clearTimeout(holdTimer);
+          document.removeEventListener('pointermove', onPointerMove);
+          document.removeEventListener('pointerup', onPointerUp);
+          el.classList.remove('cctv-holding', 'cctv-dragging');
+          map.getCanvas().style.cursor = '';
+          if (dragging) {
+            dragging = false;
+            suppressClick = true; // 드래그 직후 따라오는 click 무시(편집창 안 뜨게)
+            setTimeout(() => { suppressClick = false; }, 350); // click 미발생 시에도 곧 해제(다음 클릭 정상)
+            const p = mk.getLngLat();
+            useSiteStore.getState().moveCctv(cam.id, p.lng, p.lat);
+          }
+        };
+        el.addEventListener('pointerdown', (ev) => {
+          if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+          el.classList.add('cctv-holding');
+          document.addEventListener('pointerup', onPointerUp);
+          holdTimer = setTimeout(() => {
+            dragging = true;
+            el.classList.remove('cctv-holding');
+            el.classList.add('cctv-dragging');
+            map.getCanvas().style.cursor = 'grabbing';
+            document.addEventListener('pointermove', onPointerMove);
+          }, HOLD_MS);
+        });
         el.onclick = (e) => {
           e.stopPropagation();
-          useUIStore.getState().openCctvForm({ mode: 'edit', id: cam.id, lat: cam.lat, lng: cam.lng, name: cam.name, loc: cam.loc || '', zone: cam.zone, type: cam.type, status: cam.status, hasSpeaker: !!cam.hasSpeaker, streamUrl: cam.streamUrl || '' });
+          if (suppressClick) { suppressClick = false; return; }
+          useUIStore.getState().openCctvForm({ mode: 'edit', id: cam.id, lat: cam.lat, lng: cam.lng, name: cam.name, loc: cam.loc || '', zone: cam.zone, type: cam.type, mount: cam.mount || 'fixed', power: cam.power || 'ac', status: cam.status, hasSpeaker: !!cam.hasSpeaker, streamUrl: cam.streamUrl || '' });
         };
       } else {
         el.onclick = (e) => {
@@ -336,6 +405,20 @@ export default function MapLayer() {
     if (src) src.setData(draftGeoJSON(draftZone));
   }, [draftZone, ready]);
 
+  // 구역 추가 이름입력 단계: 이름 없이 지도를 클릭하면 안내
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready || !zoneNaming) return;
+    let last = 0;
+    const h = () => {
+      const now = performance.now();
+      if (now - last > 1500) { useUIStore.getState().pushToast('공구명을 먼저 입력한 뒤 [그리기 시작]을 누르세요', 'info'); last = now; }
+    };
+    map.on('click', h);
+    map.getCanvas().style.cursor = 'not-allowed';
+    return () => { map.off('click', h); map.getCanvas().style.cursor = ''; };
+  }, [zoneNaming, ready]);
+
   // 편집 도구별 지도 클릭 핸들러 (구역 꼭짓점 추가 / CCTV 배치)
   useEffect(() => {
     const map = mapRef.current;
@@ -349,9 +432,10 @@ export default function MapLayer() {
     }
     if (editTool === 'place-cctv') {
       const h = (e) => {
+        const st = useUIStore.getState();
         const zs = useSiteStore.getState().zones;
-        const az = useUIStore.getState().activeZone;
-        useUIStore.getState().openCctvForm({ mode: 'create', lat: e.lngLat.lat, lng: e.lngLat.lng, name: '', loc: '', zone: az || zs[0]?.id || '', type: 'fixed', status: 'online', hasSpeaker: false, streamUrl: '' });
+        const zone = st.placeCctvZone || st.activeZone || zs[0]?.id || '';
+        st.openCctvForm({ mode: 'create', lat: e.lngLat.lat, lng: e.lngLat.lng, name: '', loc: '', zone, type: 'fixed', mount: 'fixed', power: 'ac', status: 'online', hasSpeaker: false, streamUrl: '' });
       };
       map.on('click', h);
       map.getCanvas().style.cursor = 'crosshair';
@@ -366,7 +450,7 @@ export default function MapLayer() {
     const zs = useSiteStore.getState().zones;
     if (!activeZone) {
       const all = zs.flatMap((z) => z.polygon);
-      if (all.length) map.fitBounds(boundsOf(all), { padding: 100, duration: 900 });
+      if (all.length) map.fitBounds(boundsOf(all), { padding: overviewPadding(map), duration: 900 });
     } else {
       const z = zs.find((x) => x.id === activeZone);
       if (z && z.polygon?.length) map.fitBounds(boundsOf(z.polygon), { padding: 40, duration: 900, maxZoom: 16.5 });
@@ -374,12 +458,32 @@ export default function MapLayer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeZone, zoneNonce, ready]);
 
-  // 비상감지/목록 클릭 → 해당 지점으로 이동
+  // 비상감지/목록/주소검색 → 해당 지점으로 이동 (zoom 지정 가능)
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready || !camFocus) return;
-    map.flyTo({ center: [camFocus.lng, camFocus.lat], zoom: 17.5, duration: 800 });
+    map.flyTo({ center: [camFocus.lng, camFocus.lat], zoom: camFocus.zoom ?? 17.5, duration: 800 });
   }, [camFocus, ready]);
+
+  // 주소검색 결과 마커 (searchPin)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    if (searchMarkerRef.current) { searchMarkerRef.current.remove(); searchMarkerRef.current = null; }
+    if (!searchPin) return;
+    const el = document.createElement('div');
+    el.className = 'search-pin';
+    el.innerHTML = `<div class="search-pin-dot"></div>${searchPin.label ? `<div class="search-pin-label">${searchPin.label}</div>` : ''}`;
+    searchMarkerRef.current = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([searchPin.lng, searchPin.lat]).addTo(map);
+  }, [searchPin, ready]);
+
+  // 편집: 공구목록에서 구역 선택 → 폴리곤에 맞춰 프레이밍(과확대 방지)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready || !zoneFit) return;
+    const z = useSiteStore.getState().zones.find((x) => x.id === zoneFit.id);
+    if (z && z.polygon?.length) map.fitBounds(boundsOf(z.polygon), { padding: 80, maxZoom: 15.8, duration: 800 });
+  }, [zoneFit, ready]);
 
   // 베이스맵 전환
   useEffect(() => {

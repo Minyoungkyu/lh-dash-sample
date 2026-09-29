@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight, Video, VideoOff, Rotate3d, Camera, UserX, Flame, HardHat, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Video, VideoOff, Rotate3d, Camera, Truck, UserX, Flame, HardHat, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useUIStore } from '@/stores/useUIStore';
 import { useSiteStore } from '@/stores/useSiteStore';
-import { CCTV_TYPE_LABEL } from '@/lib/mock/cctv';
+import { cctvKindLabel, CCTV_POWER_LABEL } from '@/lib/mock/cctv';
 import TtsComposer from '@/components/TtsComposer';
 import HlsVideo from '@/components/HlsVideo';
 
@@ -141,7 +141,9 @@ export default function CctvPopup({ inCell = false, cam: camProp, list, onClose,
               border: '1px solid rgba(56,189,248,0.4)',
             }}
           >
-            {cam.type === 'rotating' ? (
+            {(cam.mount ?? 'fixed') === 'mobile' ? (
+              <Truck style={{ width: 24, height: 24, color: '#38bdf8' }} />
+            ) : cam.type === 'rotating' ? (
               <Rotate3d style={{ width: 24, height: 24, color: '#22d3ee' }} />
             ) : (
               <Camera style={{ width: 24, height: 24, color: '#38bdf8' }} />
@@ -160,7 +162,7 @@ export default function CctvPopup({ inCell = false, cam: camProp, list, onClose,
               </span>
             </div>
             <span className="text-cyan-400 font-bold" style={{ fontSize: 14 }}>
-              {CCTV_TYPE_LABEL[cam.type]}
+              {cctvKindLabel(cam)}{(cam.mount ?? 'fixed') === 'fixed' ? ` · ${CCTV_POWER_LABEL[cam.power] ?? CCTV_POWER_LABEL.ac}` : ''}
             </span>
           </div>
           {/* 비상 중엔 X 숨김 → 해제는 배너의 "상황 해제" 버튼으로만 */}

@@ -18,10 +18,10 @@ function MiniStat({ icon: Icon, color, value, unit, label }) {
     <div className="flex items-center" style={{ gap: 13 }}>
       <Icon style={{ width: 32, height: 32, color }} />
       <div className="flex flex-col">
-        <span className="font-black text-white" style={{ fontSize: 26, lineHeight: 1 }}>
-          {value}<span className="text-slate-300" style={{ fontSize: 16, marginLeft: 3 }}>{unit}</span>
+        <span className="font-black text-white" style={{ fontSize: 28, lineHeight: 1 }}>
+          {value}<span className="text-slate-300" style={{ fontSize: 18, marginLeft: 3 }}>{unit}</span>
         </span>
-        <span className="text-slate-400 font-bold" style={{ fontSize: 15, marginTop: 5 }}>{label}</span>
+        <span className="text-slate-400 font-bold" style={{ fontSize: 17, marginTop: 5 }}>{label}</span>
       </div>
     </div>
   );
@@ -32,8 +32,8 @@ function DustStat({ value, label, grade }) {
   return (
     <div className="flex flex-col">
       <div className="flex items-baseline" style={{ gap: 5 }}>
-        <span className="font-black" style={{ fontSize: 26, color, lineHeight: 1 }}>{value}</span>
-        <span className="font-bold" style={{ fontSize: 14, color }}>{label}</span>
+        <span className="font-black" style={{ fontSize: 28, color, lineHeight: 1 }}>{value}</span>
+        <span className="font-bold" style={{ fontSize: 16, color }}>{label}</span>
       </div>
     </div>
   );
@@ -51,7 +51,7 @@ export default function HudWeather() {
   return (
     <div
       className="absolute panel z-[500] flex items-center justify-between"
-      style={{ left: 500, right: 520, bottom: 24, height: 168, padding: '0 40px', borderRadius: 18, pointerEvents: 'auto', gap: 28 }}
+      style={{ left: 540, right: 540, bottom: 24, height: 168, padding: '0 40px', borderRadius: 18, pointerEvents: 'auto', gap: 28 }}
     >
       {/* 기온 */}
       <div className="flex items-center" style={{ gap: 18, flex: '0 0 auto' }}>
@@ -61,7 +61,7 @@ export default function HudWeather() {
             <span className="font-black text-white font-mono" style={{ fontSize: 66, lineHeight: 0.9 }}>{c.taC}</span>
             <span className="text-slate-300 font-bold" style={{ fontSize: 28 }}>℃</span>
           </div>
-          <span className="text-slate-400 font-bold" style={{ fontSize: 16, marginTop: 6 }}>
+          <span className="text-slate-400 font-bold" style={{ fontSize: 18, marginTop: 6 }}>
             최고 <span className="text-rose-300">{today.tMax}°</span> · 최저 <span className="text-sky-300">{today.tMin}°</span>
           </span>
         </div>
@@ -78,7 +78,7 @@ export default function HudWeather() {
         <span style={{ fontSize: 50, filter: `drop-shadow(0 0 12px ${tl.color})`, lineHeight: 1 }}>{tl.emoji}</span>
         <div className="flex flex-col items-start">
           <span className="font-black" style={{ fontSize: 32, color: tl.color, lineHeight: 1.05 }}>체감 {c.feelsLikeC}℃</span>
-          <span className="text-slate-300 font-bold" style={{ fontSize: 16, marginTop: 4 }}>{tl.label} 단계 · 상세 보기</span>
+          <span className="text-slate-300 font-bold" style={{ fontSize: 18, marginTop: 4 }}>{tl.label} 단계 · 상세 보기</span>
         </div>
         <div className="flex flex-col" style={{ gap: 5, marginLeft: 6 }}>
           {['red', 'orange', 'yellow', 'green'].map((cc) => {
@@ -101,8 +101,8 @@ export default function HudWeather() {
       <div className="flex items-center" style={{ gap: 22, flex: '0 0 auto' }}>
         <DustStat value={c.pm10.value} label={c.pm10.label} grade={c.pm10.grade} />
         <div className="flex flex-col items-center">
-          <span className="text-slate-400 font-bold" style={{ fontSize: 15 }}>미세</span>
-          <span className="text-slate-400 font-bold" style={{ fontSize: 15 }}>초미세</span>
+          <span className="text-slate-400 font-bold" style={{ fontSize: 17 }}>미세</span>
+          <span className="text-slate-400 font-bold" style={{ fontSize: 17 }}>초미세</span>
         </div>
         <DustStat value={c.pm25.value} label={c.pm25.label} grade={c.pm25.grade} />
       </div>
@@ -111,13 +111,13 @@ export default function HudWeather() {
 
       {/* 시간별 강수확률 */}
       <div className="flex flex-col" style={{ gap: 7, flex: '1 1 auto', minWidth: 200, maxWidth: 340 }}>
-        <span className="text-slate-400 font-bold" style={{ fontSize: 15 }}>시간별 강수확률</span>
+        <span className="text-slate-400 font-bold" style={{ fontSize: 17 }}>시간별 강수확률</span>
         <div className="flex items-end" style={{ gap: 6, height: 74 }}>
           {rainHourly.map((r) => (
             <div key={r.hour} className="flex-1 flex flex-col items-center justify-end" style={{ gap: 4, height: '100%' }}>
-              <span className="font-bold" style={{ fontSize: 12, color: r.popPct === maxPop ? '#fbbf24' : '#94a3b8' }}>{r.popPct}</span>
+              <span className="font-bold" style={{ fontSize: 14, color: r.popPct === maxPop ? '#fbbf24' : '#94a3b8' }}>{r.popPct}</span>
               <div className="w-full rounded-t" style={{ height: `${Math.max(r.popPct, 4)}%`, minHeight: 4, background: r.popPct === maxPop ? 'linear-gradient(180deg,#fbbf24,#f59e0b)' : 'linear-gradient(180deg,#38bdf8,#0ea5e9)' }} />
-              <span className="text-slate-500 font-bold" style={{ fontSize: 12 }}>{r.hour}</span>
+              <span className="text-slate-500 font-bold" style={{ fontSize: 14 }}>{r.hour}</span>
             </div>
           ))}
         </div>
@@ -127,16 +127,16 @@ export default function HudWeather() {
 
       {/* 6일 예보 */}
       <div className="flex flex-col" style={{ gap: 7, flex: '0 0 auto' }}>
-        <span className="text-slate-400 font-bold" style={{ fontSize: 15 }}>6일 예보</span>
+        <span className="text-slate-400 font-bold" style={{ fontSize: 17 }}>6일 예보</span>
         <div className="flex" style={{ gap: 8 }}>
           {forecast.days.map((day, i) => {
             const Icon = FC_ICONS[day.icon] ?? Sun;
             return (
               <div key={i} className="flex flex-col items-center" style={{ gap: 5, padding: '8px 10px', borderRadius: 11, background: day.isToday ? 'rgba(56,189,248,0.15)' : 'rgba(0,0,0,0.3)', border: day.isToday ? '1px solid rgba(56,189,248,0.5)' : '1px solid rgba(148,163,184,0.12)' }}>
-                <span className={day.isToday ? 'text-cyan-300 font-black' : 'text-slate-300 font-bold'} style={{ fontSize: 14 }}>{day.label}</span>
+                <span className={day.isToday ? 'text-cyan-300 font-black' : 'text-slate-300 font-bold'} style={{ fontSize: 16 }}>{day.label}</span>
                 <Icon style={{ width: 24, height: 24, color: FC_COLORS[day.icon] }} />
-                <span className="font-black text-white" style={{ fontSize: 14 }}>{day.tMax}°</span>
-                <span className="text-slate-500 font-bold" style={{ fontSize: 12 }}>{day.tMin}°</span>
+                <span className="font-black text-white" style={{ fontSize: 16 }}>{day.tMax}°</span>
+                <span className="text-slate-500 font-bold" style={{ fontSize: 14 }}>{day.tMin}°</span>
               </div>
             );
           })}

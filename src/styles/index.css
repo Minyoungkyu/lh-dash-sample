@@ -2,7 +2,7 @@
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
 /* ============================================================
-   이수건설 통합관제 대시보드 — 전역 스타일 (다크 관제실 톤)
+   SM삼환기업 통합관제 대시보드 — 전역 스타일 (다크 관제실 톤)
    ============================================================ */
 
 :root {
@@ -114,6 +114,52 @@ body,
 .pin-wrap:hover {
   transform: translateY(-10px) scale(1.06);
   z-index: 1000;
+}
+/* CCTV 롱프레스 이동: 누르는 중(holding) → 이동 모드(dragging) 시각 피드백 */
+.cctv-holding .pin-wrap {
+  transform: translateY(-8px) scale(1.16);
+}
+.cctv-dragging {
+  z-index: 1200;
+}
+.cctv-dragging .pin-wrap {
+  transform: translateY(-11px) scale(1.34);
+  filter: drop-shadow(0 0 10px #38e0ff);
+  cursor: grabbing;
+}
+/* 주소검색 결과 마커 */
+.search-pin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.search-pin-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e11d48;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.3), 0 2px 8px rgba(0, 0, 0, 0.5);
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+.search-pin-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(225, 29, 72, 0.92);
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* 라벨은 헤드 아래로 절대배치 → 헤드 중심이 좌표에 정확히 놓이게(화각 apex 정렬) */
 .pin-label {
