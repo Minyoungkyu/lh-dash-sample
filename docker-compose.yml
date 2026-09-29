@@ -25,6 +25,18 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # 클라이언트2: 이수건설 시흥하중(isu-hj.itu.kr). 소스는 /opt/isu-hj-dash, DB는 공유 pg의 isu-hj
+  app-isuhj:
+    build:
+      context: /opt/isu-hj-dash
+      args:
+        VITE_VWORLD_KEY: ${VITE_VWORLD_KEY}
+    env_file: /opt/isu-hj-dash/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
   nginx:
     image: nginx:alpine
     ports:
@@ -36,6 +48,7 @@ services:
       - ./certbot/www:/var/www/certbot
     depends_on:
       - app
+      - app-isuhj
     restart: unless-stopped
     # 갱신된 인증서를 주기적으로 반영
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
